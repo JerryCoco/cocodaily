@@ -8,6 +8,7 @@ import { cldUrl } from "@/lib/cld-url";
 import { ArticleCard } from "@/components/article-card";
 import { SaveButton } from "@/components/save-button";
 import { Comments } from "@/components/comments";
+import { ViewPing } from "@/components/view-ping";
 
 // Article HTML stays ISR-cached; reader-specific bits (save state, comments)
 // load client-side from /api/reader/context so this page isn't forced dynamic.
@@ -128,6 +129,7 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
       )}
 
       <Comments articleId={article.id} slug={article.slug} />
+      <ViewPing articleId={article.id} />
     </article>
   );
 }

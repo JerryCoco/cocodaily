@@ -1,10 +1,13 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { cachedJSON } from "@/lib/redis";
 
-const PUBLISHED = {
+// A function, not a const — `new Date()` must be evaluated per call, not once
+// at module load (otherwise articles published after server start stay hidden).
+const published = () => ({
   status: "PUBLISHED" as const,
   publishedAt: { lte: new Date() },
-};
+});
 
 const cardSelect = {
   id: true,
@@ -32,7 +35,7 @@ export async function getArticlePage(opts: {
 }) {
   const { sectionSlug, tagSlug, authorId, page = 1 } = opts;
   const where = {
-    ...PUBLISHED,
+    ...published(),
     ...(sectionSlug ? { section: { slug: sectionSlug } } : {}),
     ...(authorId ? { authorId } : {}),
     ...(tagSlug ? { tags: { some: { tag: { slug: tagSlug } } } } : {}),
@@ -60,7 +63,7 @@ export function getPublishedArticles(opts: {
   const { sectionSlug, tagSlug, authorId, take = 12, skip = 0 } = opts;
   return prisma.article.findMany({
     where: {
-      ...PUBLISHED,
+      ...published(),
       ...(sectionSlug ? { section: { slug: sectionSlug } } : {}),
       ...(authorId ? { authorId } : {}),
       ...(tagSlug ? { tags: { some: { tag: { slug: tagSlug } } } } : {}),
@@ -78,7 +81,7 @@ export function getTagBySlug(slug: string) {
 
 export function getArticleBySlug(slug: string) {
   return prisma.article.findFirst({
-    where: { slug, ...PUBLISHED },
+    where: { slug, ...published() },
     select: {
       ...cardSelect,
       body: true,
@@ -93,7 +96,7 @@ export function getArticleBySlug(slug: string) {
 
 export async function getRelatedArticles(articleId: string, sectionSlug: string) {
   return prisma.article.findMany({
-    where: { ...PUBLISHED, section: { slug: sectionSlug }, id: { not: articleId } },
+    where: { ...published(), section: { slug: sectionSlug }, id: { not: articleId } },
     select: cardSelect,
     orderBy: { publishedAt: "desc" },
     take: 3,
@@ -107,16 +110,23 @@ export function getAuthor(id: string) {
   });
 }
 
-/** Home page: a hero, a trending rail, and the latest per section. */
+/** Home page: a hero, a trending rail, and the latest per section.
+ *  ISR already caches the rendered page; this Redis layer (60s) shields Neon
+ *  from the query burst when `revalidatePath("/")` fires on every publish and
+ *  every view-count flush. Dates come back as ISO strings — callers coerce. */
 export async function getHomeData() {
+  return cachedJSON("home:data:v1", 60, computeHomeData);
+}
+
+async function computeHomeData() {
   const [hero, trending, sections] = await Promise.all([
     prisma.article.findFirst({
-      where: PUBLISHED,
+      where: published(),
       select: cardSelect,
       orderBy: { publishedAt: "desc" },
     }),
     prisma.article.findMany({
-      where: PUBLISHED,
+      where: published(),
       select: cardSelect,
       orderBy: { viewCount: "desc" },
       take: 5,
@@ -128,7 +138,7 @@ export async function getHomeData() {
     sections.map(async (s) => ({
       section: s,
       articles: await prisma.article.findMany({
-        where: { ...PUBLISHED, sectionId: s.id },
+        where: { ...published(), sectionId: s.id },
         select: cardSelect,
         orderBy: { publishedAt: "desc" },
         take: 4,

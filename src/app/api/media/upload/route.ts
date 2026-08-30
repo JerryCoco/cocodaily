@@ -1,12 +1,16 @@
 import { requireStaff } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { cloudinary, UPLOAD_FOLDER } from "@/lib/cloudinary";
+import { allow, limiters } from "@/lib/rate-limit";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 const OK_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"]);
 
 export async function POST(req: Request) {
-  await requireStaff();
+  const user = await requireStaff();
+  if (!(await allow(limiters.upload, `upload:${user.id}`))) {
+    return Response.json({ error: "Too many uploads — slow down." }, { status: 429 });
+  }
 
   const form = await req.formData();
   const file = form.get("file");

@@ -13,8 +13,8 @@ Tailwind v4 · Cloudinary (images). Redis (Upstash) caching comes in Week 4.
 
 ## Status
 
-**Weeks 1–3 + 5 done, plus Cloudinary image upload.** Week 4 (Redis caching) is
-pending Upstash credentials.
+**Weeks 1–5 done** (+ Cloudinary images, + Upstash Redis). Redis calls are
+guarded — the app also runs fine without the Upstash env vars.
 
 **Data & auth** — Prisma schema (User+role, Section, Tag, Article+status,
 Revision, Media, Comment, SavedArticle, NewsletterSubscriber, Auth.js models) on
@@ -38,6 +38,12 @@ Cloudinary (folder `coco/`), alt text required; `cldUrl()` builds
 as a fallback. `/api/cron/publish` flips due scheduled articles (Vercel Cron in
 `vercel.json`).
 
+**Caching / Redis (Upstash)** — article views count in Redis (`<ViewPing>` →
+`/api/articles/[id]/view`), `/api/cron/flush-views` folds them into Postgres
+every 5 min so views never hit the DB on the hot path. `getHomeData()` has a 60s
+Redis read-through cache. Sliding-window rate limits on comments / newsletter /
+register / uploads. All Redis calls no-op without the Upstash env vars.
+
 **Readers** — `/register` + `/login` (Auth.js Credentials, role `READER`).
 Newsletter subscribe (footer) + one-click `/newsletter/unsubscribe`.
 Save-for-later (`☆`/`★` on articles → `/account/saved`). Comments: signed-in
@@ -53,8 +59,8 @@ headlines.
 Seed: 4 staff, 6 sections, 8 tags, 44 articles (~37 published). Staff login:
 `ada@coco.test` / `password123`.
 
-**Next:** Redis read-counters via Upstash (Week 4) → editor analytics dashboard
-+ accessibility/Lighthouse pass + deploy (Week 6).
+**Next (Week 6):** editor analytics dashboard, accessibility/Lighthouse pass,
+deploy to Vercel.
 
 ## Setup
 

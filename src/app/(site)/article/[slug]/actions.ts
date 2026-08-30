@@ -6,6 +6,7 @@ import type { CommentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth-helpers";
 import { scoreComment } from "@/lib/spam";
+import { allow, limiters } from "@/lib/rate-limit";
 
 // ---- save for later -------------------------------------------------------
 
@@ -33,6 +34,9 @@ export async function postComment(
   raw: string,
 ): Promise<{ ok: boolean; status?: CommentStatus; error?: string }> {
   const user = await requireUser();
+  if (!(await allow(limiters.comment, `comment:${user.id}`))) {
+    return { ok: false, error: "You're commenting too fast — try again in a few minutes." };
+  }
   const parsed = bodySchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message };
   const body = parsed.data;

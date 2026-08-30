@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { allow, limiters } from "@/lib/rate-limit";
 
 const emailSchema = z.string().trim().toLowerCase().email();
 
@@ -12,6 +13,10 @@ export async function subscribeNewsletter(
   const parsed = emailSchema.safeParse(formData.get("email"));
   if (!parsed.success) return { ok: false, message: "Enter a valid email address." };
   const email = parsed.data;
+
+  if (!(await allow(limiters.newsletter, `news:${email}`))) {
+    return { ok: false, message: "Too many attempts. Try again later." };
+  }
 
   const existing = await prisma.newsletterSubscriber.findUnique({ where: { email } });
   if (existing) {
