@@ -1,0 +1,216 @@
+// Entertainment News Platform — data model
+// See C:\Projects\big-01-entertainment-news-platform.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// People
+// ---------------------------------------------------------------------------
+
+enum Role {
+  READER // default: can comment, subscribe, save
+  WRITER // can create + edit their OWN drafts
+  EDITOR // can review + publish ANY article
+  ADMIN // + user management, settings
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String? // set for staff (credentials login)
+  role         Role     @default(READER)
+  bio          String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+
+  articles  Article[]  @relation("ArticleAuthor")
+  revisions Revision[]
+  comments  Comment[]
+  saves     SavedArticle[]
+  accounts  Account[]
+  sessions  Session[]
+}
+
+// ---------------------------------------------------------------------------
+// Taxonomy
+// ---------------------------------------------------------------------------
+
+model Section {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  color    String    @default("#e11d48") // section color token
+  articles Article[]
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  name     String       @unique
+  slug     String       @unique
+  articles ArticleTag[]
+}
+
+// ---------------------------------------------------------------------------
+// Content
+// ---------------------------------------------------------------------------
+
+enum ArticleStatus {
+  DRAFT
+  IN_REVIEW
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+model Article {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  excerpt      String?
+  body         Json // Tiptap document JSON
+  status       ArticleStatus @default(DRAFT)
+  publishedAt  DateTime?
+  scheduledFor DateTime?
+  viewCount    Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  sectionId String
+  section   Section @relation(fields: [sectionId], references: [id])
+
+  authorId String
+  author   User   @relation("ArticleAuthor", fields: [authorId], references: [id])
+
+  coverMediaId String?
+  coverMedia   Media?  @relation(fields: [coverMediaId], references: [id])
+
+  tags      ArticleTag[]
+  revisions Revision[]
+  comments  Comment[]
+  saves     SavedArticle[]
+
+  @@index([status, publishedAt])
+  @@index([sectionId, status, publishedAt])
+  @@index([authorId, status])
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+}
+
+model Revision {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  editorId  String
+  editor    User     @relation(fields: [editorId], references: [id])
+  title     String
+  body      Json
+  createdAt DateTime @default(now())
+
+  @@index([articleId, createdAt])
+}
+
+model Media {
+  id          String   @id @default(cuid())
+  originalUrl String
+  alt         String
+  width       Int?
+  height      Int?
+  variants    Json? // [{ w: 400, url: "..." }, ...]
+  createdAt   DateTime @default(now())
+
+  articles Article[]
+}
+
+// ---------------------------------------------------------------------------
+// Reader engagement
+// ---------------------------------------------------------------------------
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+  REJECTED
+}
+
+model Comment {
+  id        String        @id @default(cuid())
+  articleId String
+  article   Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  body      String
+  status    CommentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+
+  @@index([status, createdAt])
+  @@index([articleId, status])
+}
+
+model SavedArticle {
+  userId    String
+  articleId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, articleId])
+}
+
+model NewsletterSubscriber {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  confirmedAt DateTime?
+  unsubToken  String    @unique @default(cuid())
+  createdAt   DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js (NextAuth v5) — adapter models
+// ---------------------------------------------------------------------------
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}

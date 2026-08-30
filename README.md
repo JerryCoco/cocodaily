@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Marquee — Entertainment News Platform
 
-## Getting Started
+Flagship Project #1. Full spec:
+`C:\Projects\big-01-entertainment-news-platform.md`.
 
-First, run the development server:
+An editorial CMS with a publishing workflow behind it and a fast, SEO-strong
+public site in front. Not a markdown blog — a multi-author newsroom tool.
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · Prisma 6 + PostgreSQL (Neon) · Auth.js v5 ·
+Tailwind v4. Redis + Cloudflare R2 come in later weeks.
+
+## Status — Week 1
+
+Done:
+- Prisma schema: `User`(role), `Section`, `Tag`, `Article`(status), `Revision`,
+  `Media`, `Comment`, `SavedArticle`, `NewsletterSubscriber`, Auth.js models
+- Auth.js v5 with a Credentials provider, JWT sessions, `role` on the session
+- Public routes rendering from the DB: home (hero + trending + latest per
+  section), `/[section]`, `/article/[slug]` (with `NewsArticle` JSON-LD),
+  `/author/[id]`
+- Strict allow-list Tiptap JSON -> React renderer (`src/lib/render-tiptap.tsx`)
+- Design tokens in `globals.css` (`@theme`): neutrals, one accent, per-section
+  colors, workflow status colors, editorial type scale
+- Seed: 4 staff users, 6 sections, 8 tags, 44 articles (mostly published)
+
+Next (Week 2): Tiptap editor + article create/edit, workflow state transitions,
+revision history, media upload to R2.
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+# put your Neon connection string in .env  (DATABASE_URL)
+npm run db:migrate      # create tables
+npm run db:seed         # demo content
+npm run dev             # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Seeded staff login: `ada@marquee.test` / `password123`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Script | Does |
+|---|---|
+| `npm run dev` | Next dev server |
+| `npm run db:migrate` | `prisma migrate dev` |
+| `npm run db:seed` | load demo content |
+| `npm run db:studio` | Prisma Studio (browse the DB) |
+| `npm run build` | production build |
