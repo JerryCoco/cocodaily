@@ -18,7 +18,10 @@ export default async function StudioLayout({ children }: LayoutProps<"/studio">)
           <Link href="/studio" className="rounded-md px-3 py-2 hover:bg-bg">Articles</Link>
           <Link href="/studio/articles/new" className="rounded-md px-3 py-2 hover:bg-bg">New article</Link>
           {isEditor && (
-            <Link href="/studio/comments" className="rounded-md px-3 py-2 hover:bg-bg">Comments</Link>
+            <>
+              <Link href="/studio/comments" className="rounded-md px-3 py-2 hover:bg-bg">Comments</Link>
+              <Link href="/studio/analytics" className="rounded-md px-3 py-2 hover:bg-bg">Analytics</Link>
+            </>
           )}
         </nav>
 
@@ -36,7 +39,7 @@ export default async function StudioLayout({ children }: LayoutProps<"/studio">)
         </div>
       </aside>
 
-      <main className="flex-1 px-8 py-8">{children}</main>
+      <main id="main" className="flex-1 px-8 py-8">{children}</main>
     </div>
   );
 }

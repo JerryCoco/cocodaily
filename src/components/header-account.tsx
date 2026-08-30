@@ -32,9 +32,11 @@ export function HeaderAccount() {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
         className="rounded-md border border-line px-3 py-1.5 text-sm hover:bg-bg"
       >
-        {(user.name ?? "Account").split(" ")[0]} ▾
+        {(user.name ?? "Account").split(" ")[0]} <span aria-hidden="true">▾</span>
       </button>
       {open && (
         <div

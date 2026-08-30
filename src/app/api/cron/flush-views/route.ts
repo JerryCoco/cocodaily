@@ -18,13 +18,21 @@ export async function GET(req: Request) {
   const pending = await drainViews();
   if (pending.length === 0) return Response.json({ flushed: 0 });
 
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
   await prisma.$transaction(
-    pending.map((p) =>
+    pending.flatMap((p) => [
       prisma.article.update({
         where: { id: p.id },
         data: { viewCount: { increment: p.delta } },
       }),
-    ),
+      prisma.viewDaily.upsert({
+        where: { articleId_day: { articleId: p.id, day: today } },
+        create: { articleId: p.id, day: today, views: p.delta },
+        update: { views: { increment: p.delta } },
+      }),
+    ]),
   );
 
   // trending on the home page is ordered by viewCount

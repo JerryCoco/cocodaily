@@ -37,7 +37,7 @@ export function SaveButton({ articleId }: { articleId: string }) {
         saved ? "border-accent bg-accent/10 text-accent" : "border-line text-muted hover:bg-bg"
       }`}
     >
-      {saved ? "★ Saved" : "☆ Save"}
+      <span aria-hidden="true">{saved ? "★" : "☆"}</span> {saved ? "Saved" : "Save"}
     </button>
   );
 }

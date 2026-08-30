@@ -13,7 +13,7 @@ export async function SiteHeader() {
         <Link href="/" className="font-display text-2xl font-extrabold">
           Coco
         </Link>
-        <nav className="hidden gap-4 text-sm font-medium text-muted md:flex">
+        <nav aria-label="Sections" className="hidden gap-4 text-sm font-medium text-muted md:flex">
           {sections.map((s) => (
             <Link key={s.slug} href={`/${s.slug}`} className="hover:text-ink">
               {s.name}
@@ -21,10 +21,11 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-3">
-          <form action="/search" className="hidden sm:block">
+          <form action="/search" role="search" className="hidden sm:block">
             <input
               type="search"
               name="q"
+              aria-label="Search articles"
               placeholder="Search…"
               className="w-40 rounded-md border border-line bg-bg px-3 py-1.5 text-sm outline-none focus:w-56 focus:border-accent"
             />

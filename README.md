@@ -8,13 +8,12 @@ public site in front. Not a markdown blog — a multi-author newsroom tool.
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · Prisma 6 + PostgreSQL (Neon) · Auth.js v5 ·
-Tailwind v4 · Cloudinary (images). Redis (Upstash) caching comes in Week 4.
+Next.js 16 (App Router) · React 19 · Prisma 6 + PostgreSQL (Neon) · Redis
+(Upstash) · Auth.js v5 · Tailwind v4 · Cloudinary (images).
 
 ## Status
 
-**Weeks 1–5 done** (+ Cloudinary images, + Upstash Redis). Redis calls are
-guarded — the app also runs fine without the Upstash env vars.
+**All 6 build weeks done.** Only the Vercel deploy remains — see `DEPLOY.md`.
 
 **Data & auth** — Prisma schema (User+role, Section, Tag, Article+status,
 Revision, Media, Comment, SavedArticle, NewsletterSubscriber, Auth.js models) on
@@ -36,7 +35,9 @@ publish/edit. **Cover-image upload** — auth-gated `/api/media/upload` streams 
 Cloudinary (folder `coco/`), alt text required; `cldUrl()` builds
 `f_auto,q_auto,w_*` transform URLs for cards and heroes; paste-a-URL still works
 as a fallback. `/api/cron/publish` flips due scheduled articles (Vercel Cron in
-`vercel.json`).
+`vercel.json`). **Analytics** (`/studio/analytics`, editor-only) — views over 30
+days (from a `ViewDaily` rollup the flush cron writes), top articles, subscriber
+growth, comment breakdown, most-saved; hand-rolled SVG charts, no chart lib.
 
 **Caching / Redis (Upstash)** — article views count in Redis (`<ViewPing>` →
 `/api/articles/[id]/view`), `/api/cron/flush-views` folds them into Postgres
@@ -59,8 +60,7 @@ headlines.
 Seed: 4 staff, 6 sections, 8 tags, 44 articles (~37 published). Staff login:
 `ada@coco.test` / `password123`.
 
-**Next (Week 6):** editor analytics dashboard, accessibility/Lighthouse pass,
-deploy to Vercel.
+**Next:** deploy to Vercel (`DEPLOY.md`), then swap the seeded passwords.
 
 ## Setup
 

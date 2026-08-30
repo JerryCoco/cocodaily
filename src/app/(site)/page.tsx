@@ -19,6 +19,7 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-14">
+      <h1 className="sr-only">Coco — latest entertainment news</h1>
       {/* Hero + trending */}
       <section className="grid gap-10 md:grid-cols-[1.9fr_1fr]">
         <ArticleCard article={hero} size="lg" />

@@ -96,14 +96,27 @@ model Article {
   coverMediaId String?
   coverMedia   Media?  @relation(fields: [coverMediaId], references: [id])
 
-  tags      ArticleTag[]
-  revisions Revision[]
-  comments  Comment[]
-  saves     SavedArticle[]
+  tags       ArticleTag[]
+  revisions  Revision[]
+  comments   Comment[]
+  saves      SavedArticle[]
+  viewsDaily ViewDaily[]
 
   @@index([status, publishedAt])
   @@index([sectionId, status, publishedAt])
   @@index([authorId, status])
+}
+
+/// Daily view rollup — written by /api/cron/flush-views (one upsert per article
+/// per day), never per request. Powers the analytics "views over time" chart.
+model ViewDaily {
+  articleId String
+  day       DateTime @db.Date
+  views     Int      @default(0)
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, day])
+  @@index([day])
 }
 
 model ArticleTag {

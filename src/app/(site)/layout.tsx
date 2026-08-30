@@ -6,7 +6,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+      <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
       <footer className="border-t border-line bg-surface">
         <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8 sm:flex-row sm:items-start sm:justify-between">
           <div>

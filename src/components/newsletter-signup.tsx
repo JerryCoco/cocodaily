@@ -15,6 +15,7 @@ export function NewsletterSignup() {
           type="email"
           name="email"
           required
+          aria-label="Email address for the newsletter"
           placeholder="you@example.com"
           className="flex-1 rounded-md border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
         />
