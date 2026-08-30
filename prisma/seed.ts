@@ -13,10 +13,10 @@ const SECTIONS = [
 ];
 
 const STAFF = [
-  { name: "Ada Obi", email: "ada@marquee.test", role: "EDITOR" as const, bio: "Editor-in-chief. Covers film and awards season." },
-  { name: "Tunde Bello", email: "tunde@marquee.test", role: "WRITER" as const, bio: "Staff writer on music and nightlife." },
-  { name: "Chika Nwosu", email: "chika@marquee.test", role: "WRITER" as const, bio: "TV and streaming reporter." },
-  { name: "Sam Reyes", email: "sam@marquee.test", role: "ADMIN" as const, bio: "Founder. Keeps the lights on." },
+  { name: "Ada Obi", email: "ada@coco.test", role: "EDITOR" as const, bio: "Editor-in-chief. Covers film and awards season." },
+  { name: "Tunde Bello", email: "tunde@coco.test", role: "WRITER" as const, bio: "Staff writer on music and nightlife." },
+  { name: "Chika Nwosu", email: "chika@coco.test", role: "WRITER" as const, bio: "TV and streaming reporter." },
+  { name: "Sam Reyes", email: "sam@coco.test", role: "ADMIN" as const, bio: "Founder. Keeps the lights on." },
 ];
 
 const TAGS = ["interview", "box-office", "trailer", "review", "red-carpet", "streaming", "exclusive", "ranked"];
@@ -57,6 +57,15 @@ const body = (title: string) => ({
     para("Whether the momentum holds is another question. The next few weeks will tell us if this is a genuine turning point or a well-timed anomaly."),
   ],
 });
+
+function flatten(node: unknown): string {
+  if (!node || typeof node !== "object") return "";
+  const n = node as { text?: string; content?: unknown[] };
+  let out = n.text ?? "";
+  if (Array.isArray(n.content)) out += " " + n.content.map(flatten).join(" ");
+  return out;
+}
+const plainOf = (title: string) => flatten(body(title)).replace(/\s+/g, " ").trim();
 
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-").slice(0, 60);
@@ -113,6 +122,7 @@ async function main() {
         slug,
         excerpt: "A closer look at the week's biggest entertainment story and what it means next.",
         body: body(title),
+        plainText: plainOf(title),
         status,
         publishedAt,
         scheduledFor,
@@ -121,7 +131,7 @@ async function main() {
         author: { connect: { id: author.id } },
         coverMedia: {
           create: {
-            originalUrl: `https://picsum.photos/seed/marquee${i}/1200/675`,
+            originalUrl: `https://picsum.photos/seed/coco${i}/1200/675`,
             alt: title,
             width: 1200,
             height: 675,
@@ -138,7 +148,7 @@ async function main() {
   }
 
   console.log(`seeded ${users.length} users, ${sections.length} sections, 44 articles (${n} published)`);
-  console.log("staff login: ada@marquee.test / password123");
+  console.log("staff login: ada@coco.test / password123");
 }
 
 main()

@@ -1,4 +1,4 @@
-# Marquee — Entertainment News Platform
+# Coco — Entertainment News Platform
 
 Flagship Project #1. Full spec:
 `C:\Projects\big-01-entertainment-news-platform.md`.
@@ -9,24 +9,44 @@ public site in front. Not a markdown blog — a multi-author newsroom tool.
 ## Stack
 
 Next.js 16 (App Router) · React 19 · Prisma 6 + PostgreSQL (Neon) · Auth.js v5 ·
-Tailwind v4. Redis + Cloudflare R2 come in later weeks.
+Tailwind v4 · Cloudinary (images). Redis (Upstash) caching comes in Week 4.
 
-## Status — Week 1
+## Status
 
-Done:
-- Prisma schema: `User`(role), `Section`, `Tag`, `Article`(status), `Revision`,
-  `Media`, `Comment`, `SavedArticle`, `NewsletterSubscriber`, Auth.js models
-- Auth.js v5 with a Credentials provider, JWT sessions, `role` on the session
-- Public routes rendering from the DB: home (hero + trending + latest per
-  section), `/[section]`, `/article/[slug]` (with `NewsArticle` JSON-LD),
-  `/author/[id]`
-- Strict allow-list Tiptap JSON -> React renderer (`src/lib/render-tiptap.tsx`)
-- Design tokens in `globals.css` (`@theme`): neutrals, one accent, per-section
-  colors, workflow status colors, editorial type scale
-- Seed: 4 staff users, 6 sections, 8 tags, 44 articles (mostly published)
+**Weeks 1–3 done, plus Week 2's Cloudinary image upload.** Week 4's Redis
+caching is pending Upstash credentials.
 
-Next (Week 2): Tiptap editor + article create/edit, workflow state transitions,
-revision history, media upload to R2.
+**Data & auth** — Prisma schema (User+role, Section, Tag, Article+status,
+Revision, Media, Comment, SavedArticle, NewsletterSubscriber, Auth.js models) on
+Neon. Auth.js v5 split config (`auth.config.ts` edge-safe + `auth.ts`),
+Credentials + JWT, `role` on the session. `proxy.ts` gates `/studio`.
+
+**Public site** — home (hero + trending + per-section rails), `/[section]`,
+`/article/[slug]` (`NewsArticle` JSON-LD, OG, reading time), `/author/[id]`,
+`/tag/[slug]`, all paginated. `/search` — Postgres full-text search (generated
+`searchVector` tsvector + GIN index, weighted title/excerpt/body,
+`ts_rank`-ordered). `/feed.xml` RSS, `sitemap.xml`, `robots.txt`. Strict
+allow-list Tiptap JSON → React renderer.
+
+**Newsroom CMS** (`/studio`) — article list with status filters, Tiptap editor,
+create/edit with server actions (zod, unique slug, tag upsert), workflow state
+machine (`draft → in review → scheduled → published → archived`) with per-role
+rules, revision history + restore, on-demand `revalidatePath` on
+publish/edit. **Cover-image upload** — auth-gated `/api/media/upload` streams to
+Cloudinary (folder `coco/`), alt text required; `cldUrl()` builds
+`f_auto,q_auto,w_*` transform URLs for cards and heroes; paste-a-URL still works
+as a fallback. `/api/cron/publish` flips due scheduled articles (Vercel Cron in
+`vercel.json`).
+
+**Design** — tokens in `globals.css` `@theme` (neutrals, one accent, per-section
+colors, CMS status colors, editorial type scale) + **Fraunces** display serif on
+headlines.
+
+Seed: 4 staff, 6 sections, 8 tags, 44 articles (~37 published). Staff login:
+`ada@coco.test` / `password123`.
+
+**Next:** Redis read-counters via Upstash (needs
+Upstash) → reader accounts / newsletter / comments → editor analytics + deploy.
 
 ## Setup
 
@@ -38,7 +58,7 @@ npm run db:seed         # demo content
 npm run dev             # http://localhost:3000
 ```
 
-Seeded staff login: `ada@marquee.test` / `password123`
+Seeded staff login: `ada@coco.test` / `password123` (`/studio` for the CMS)
 
 ## Scripts
 

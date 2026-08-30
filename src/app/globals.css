@@ -43,6 +43,11 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+:root {
+  /* Kept out of @theme so it doesn't collide with a generated utility. */
+  --display-family: var(--font-display), Georgia, "Times New Roman", serif;
+}
+
 html {
   background: var(--color-bg);
   color: var(--color-ink);
@@ -50,4 +55,30 @@ html {
 
 body {
   font-family: var(--font-sans);
+}
+
+/* Editorial headlines use the display serif. */
+.font-display {
+  font-family: var(--display-family);
+  letter-spacing: -0.015em;
+}
+
+/* Cover-image placeholder while the real image loads. */
+.img-skeleton {
+  background: linear-gradient(100deg, #edeae6 30%, #f4f2ef 50%, #edeae6 70%);
+  background-size: 200% 100%;
+  animation: img-skeleton-pan 1.4s ease-in-out infinite;
+}
+@keyframes img-skeleton-pan {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .img-skeleton {
+    animation: none;
+  }
 }

@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled (PgBouncer) — app runtime
+  directUrl = env("DIRECT_URL") // unpooled — migrations & introspection
 }
 
 // ---------------------------------------------------------------------------
@@ -76,6 +77,9 @@ model Article {
   slug         String        @unique
   excerpt      String?
   body         Json // Tiptap document JSON
+  plainText    String        @default("") // body flattened to text, for search + reading time
+  /// Generated tsvector (see migration article_search_vector). Read-only — never written by Prisma.
+  searchVector Unsupported("tsvector")?
   status       ArticleStatus @default(DRAFT)
   publishedAt  DateTime?
   scheduledFor DateTime?
@@ -126,11 +130,11 @@ model Revision {
 
 model Media {
   id          String   @id @default(cuid())
-  originalUrl String
+  originalUrl String // Cloudinary secure_url (or any pasted URL)
+  publicId    String? // Cloudinary public_id — present for uploaded images; used to build transform URLs
   alt         String
   width       Int?
   height      Int?
-  variants    Json? // [{ w: 400, url: "..." }, ...]
   createdAt   DateTime @default(now())
 
   articles Article[]

@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getArticleBySlug, getRelatedArticles } from "@/lib/queries";
 import { RenderTiptap } from "@/lib/render-tiptap";
+import { readingTimeMinutes } from "@/lib/tiptap-text";
+import { cldUrl } from "@/lib/cld-url";
 import { ArticleCard } from "@/components/article-card";
 
 export const revalidate = 300;
@@ -59,22 +61,26 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
       >
         {article.section.name}
       </Link>
-      <h1 className="mt-2 text-4xl font-extrabold leading-tight">{article.title}</h1>
+      <h1 className="font-display mt-2 text-4xl font-extrabold leading-[1.1]">{article.title}</h1>
       {article.excerpt && <p className="mt-3 text-xl text-muted">{article.excerpt}</p>}
 
-      <div className="mt-4 flex items-center gap-2 border-y border-line py-3 text-sm text-muted">
+      <div className="mt-4 flex flex-wrap items-center gap-2 border-y border-line py-3 text-sm text-muted">
         {article.author.name && (
           <Link href={`/author/${article.author.id}`} className="font-medium text-ink hover:text-accent">
             {article.author.name}
           </Link>
         )}
         <span>· {fmtDate(article.publishedAt)}</span>
+        <span>· {readingTimeMinutes(article.plainText)} min read</span>
       </div>
 
       {article.coverMedia && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={article.coverMedia.originalUrl}
+          src={cldUrl(article.coverMedia.publicId, {
+            w: 1400,
+            fallbackUrl: article.coverMedia.originalUrl,
+          })}
           alt={article.coverMedia.alt}
           className="mt-6 w-full rounded-lg"
         />
@@ -87,9 +93,13 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
       {article.tags.length > 0 && (
         <div className="mt-8 flex flex-wrap gap-2">
           {article.tags.map(({ tag }) => (
-            <span key={tag.slug} className="rounded-full bg-line px-3 py-1 text-sm text-muted">
+            <Link
+              key={tag.slug}
+              href={`/tag/${tag.slug}`}
+              className="rounded-full bg-line px-3 py-1 text-sm text-muted hover:bg-line/70 hover:text-ink"
+            >
               #{tag.name}
-            </span>
+            </Link>
           ))}
         </div>
       )}

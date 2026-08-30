@@ -14,14 +14,43 @@ const cardSelect = {
   publishedAt: true,
   section: { select: { name: true, slug: true, color: true } },
   author: { select: { id: true, name: true } },
-  coverMedia: { select: { originalUrl: true, alt: true } },
+  coverMedia: { select: { originalUrl: true, publicId: true, alt: true } },
 } as const;
 
 export function getSections() {
   return prisma.section.findMany({ orderBy: { name: "asc" } });
 }
 
-export async function getPublishedArticles(opts: {
+export const PAGE_SIZE = 12;
+
+/** One page of published articles + total count, for section / author / tag pages. */
+export async function getArticlePage(opts: {
+  sectionSlug?: string;
+  tagSlug?: string;
+  authorId?: string;
+  page?: number;
+}) {
+  const { sectionSlug, tagSlug, authorId, page = 1 } = opts;
+  const where = {
+    ...PUBLISHED,
+    ...(sectionSlug ? { section: { slug: sectionSlug } } : {}),
+    ...(authorId ? { authorId } : {}),
+    ...(tagSlug ? { tags: { some: { tag: { slug: tagSlug } } } } : {}),
+  };
+  const [items, total] = await Promise.all([
+    prisma.article.findMany({
+      where,
+      select: cardSelect,
+      orderBy: { publishedAt: "desc" },
+      take: PAGE_SIZE,
+      skip: (Math.max(page, 1) - 1) * PAGE_SIZE,
+    }),
+    prisma.article.count({ where }),
+  ]);
+  return { items, total, page: Math.max(page, 1), pages: Math.ceil(total / PAGE_SIZE) };
+}
+
+export function getPublishedArticles(opts: {
   sectionSlug?: string;
   tagSlug?: string;
   authorId?: string;
@@ -43,12 +72,17 @@ export async function getPublishedArticles(opts: {
   });
 }
 
+export function getTagBySlug(slug: string) {
+  return prisma.tag.findUnique({ where: { slug }, select: { name: true, slug: true } });
+}
+
 export function getArticleBySlug(slug: string) {
   return prisma.article.findFirst({
     where: { slug, ...PUBLISHED },
     select: {
       ...cardSelect,
       body: true,
+      plainText: true,
       viewCount: true,
       updatedAt: true,
       author: { select: { id: true, name: true, bio: true, avatarUrl: true } },

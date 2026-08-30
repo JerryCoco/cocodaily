@@ -1,8 +1,9 @@
 import NextAuth from "next-auth";
 import { authConfig } from "@/auth.config";
 
-// Edge-safe: uses only authConfig (no adapter / Prisma / bcrypt). The
-// `authorized` callback in authConfig gates /admin and /studio.
+// Next 16 "proxy" convention (formerly middleware). Edge-safe: uses only
+// authConfig (no adapter / Prisma / bcrypt). The `authorized` callback in
+// authConfig gates /studio and /admin.
 export default NextAuth(authConfig).auth;
 
 export const config = {

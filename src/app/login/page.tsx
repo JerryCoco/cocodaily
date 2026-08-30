@@ -7,7 +7,9 @@ export const metadata = { title: "Sign in" };
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const session = await auth();
   if (session) redirect("/");
-  const { from, error } = await searchParams;
+  const sp = await searchParams;
+  const from = sp.from ?? sp.callbackUrl; // Auth.js redirects use ?callbackUrl
+  const error = sp.error;
 
   async function login(formData: FormData) {
     "use server";
@@ -62,7 +64,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       </form>
 
       <p className="mt-4 text-xs text-muted">
-        Seeded editor: <code>ada@marquee.test</code> / <code>password123</code>
+        Seeded editor: <code>ada@coco.test</code> / <code>password123</code>
       </p>
     </div>
   );

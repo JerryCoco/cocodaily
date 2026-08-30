@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAuthor, getPublishedArticles } from "@/lib/queries";
+import { getAuthor, getArticlePage } from "@/lib/queries";
 import { ArticleCard } from "@/components/article-card";
+import { Pagination } from "@/components/pagination";
 
 export const revalidate = 300;
 
@@ -13,12 +14,15 @@ export async function generateMetadata({
   return { title: author?.name ?? "Author" };
 }
 
-export default async function AuthorPage({ params }: PageProps<"/author/[id]">) {
+export default async function AuthorPage({ params, searchParams }: PageProps<"/author/[id]">) {
   const { id } = await params;
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
   const author = await getAuthor(id);
   if (!author) notFound();
 
-  const articles = await getPublishedArticles({ authorId: id, take: 24 });
+  const { items, pages } = await getArticlePage({ authorId: id, page });
 
   return (
     <div>
@@ -28,20 +32,21 @@ export default async function AuthorPage({ params }: PageProps<"/author/[id]">) 
           <img src={author.avatarUrl} alt={author.name ?? ""} className="h-16 w-16 rounded-full object-cover" />
         )}
         <div>
-          <h1 className="text-3xl font-extrabold">{author.name}</h1>
+          <h1 className="font-display text-3xl font-extrabold">{author.name}</h1>
           {author.bio && <p className="mt-1 text-muted">{author.bio}</p>}
         </div>
       </header>
 
-      {articles.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-muted">No published articles.</p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((a) => (
+          {items.map((a) => (
             <ArticleCard key={a.slug} article={a} />
           ))}
         </div>
       )}
+      <Pagination page={page} pages={pages} basePath={`/author/${id}`} />
     </div>
   );
 }
