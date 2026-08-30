@@ -6,7 +6,11 @@ import { RenderTiptap } from "@/lib/render-tiptap";
 import { readingTimeMinutes } from "@/lib/tiptap-text";
 import { cldUrl } from "@/lib/cld-url";
 import { ArticleCard } from "@/components/article-card";
+import { SaveButton } from "@/components/save-button";
+import { Comments } from "@/components/comments";
 
+// Article HTML stays ISR-cached; reader-specific bits (save state, comments)
+// load client-side from /api/reader/context so this page isn't forced dynamic.
 export const revalidate = 300;
 
 export async function generateMetadata({
@@ -72,6 +76,7 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
         )}
         <span>· {fmtDate(article.publishedAt)}</span>
         <span>· {readingTimeMinutes(article.plainText)} min read</span>
+        <span className="ml-auto"><SaveButton articleId={article.id} /></span>
       </div>
 
       {article.coverMedia && (
@@ -113,7 +118,7 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
 
       {related.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-extrabold">More in {article.section.name}</h2>
+          <h2 className="font-display mb-4 text-2xl font-extrabold">More in {article.section.name}</h2>
           <div className="grid gap-6 sm:grid-cols-3">
             {related.map((a) => (
               <ArticleCard key={a.slug} article={a} />
@@ -121,6 +126,8 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
           </div>
         </section>
       )}
+
+      <Comments articleId={article.id} slug={article.slug} />
     </article>
   );
 }

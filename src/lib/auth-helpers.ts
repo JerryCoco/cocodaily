@@ -11,6 +11,13 @@ export async function getSessionUser() {
   return session?.user ?? null;
 }
 
+/** Require any signed-in user (READER included). Redirects to /login otherwise. */
+export async function requireUser(from = "/") {
+  const user = await getSessionUser();
+  if (!user) redirect(`/login?from=${encodeURIComponent(from)}`);
+  return user;
+}
+
 /** Require any signed-in staff (WRITER+). Redirects to /login otherwise. */
 export async function requireStaff() {
   const user = await getSessionUser();

@@ -13,8 +13,8 @@ Tailwind v4 · Cloudinary (images). Redis (Upstash) caching comes in Week 4.
 
 ## Status
 
-**Weeks 1–3 done, plus Week 2's Cloudinary image upload.** Week 4's Redis
-caching is pending Upstash credentials.
+**Weeks 1–3 + 5 done, plus Cloudinary image upload.** Week 4 (Redis caching) is
+pending Upstash credentials.
 
 **Data & auth** — Prisma schema (User+role, Section, Tag, Article+status,
 Revision, Media, Comment, SavedArticle, NewsletterSubscriber, Auth.js models) on
@@ -38,6 +38,14 @@ Cloudinary (folder `coco/`), alt text required; `cldUrl()` builds
 as a fallback. `/api/cron/publish` flips due scheduled articles (Vercel Cron in
 `vercel.json`).
 
+**Readers** — `/register` + `/login` (Auth.js Credentials, role `READER`).
+Newsletter subscribe (footer) + one-click `/newsletter/unsubscribe`.
+Save-for-later (`☆`/`★` on articles → `/account/saved`). Comments: signed-in
+readers post, `src/lib/spam.ts` heuristics + a trust rule route new comments to a
+moderation queue (`/studio/comments`, editor-only) with approve / reject / spam /
+delete. The article page stays ISR — reader-specific bits load client-side from
+`/api/reader/context`.
+
 **Design** — tokens in `globals.css` `@theme` (neutrals, one accent, per-section
 colors, CMS status colors, editorial type scale) + **Fraunces** display serif on
 headlines.
@@ -45,8 +53,8 @@ headlines.
 Seed: 4 staff, 6 sections, 8 tags, 44 articles (~37 published). Staff login:
 `ada@coco.test` / `password123`.
 
-**Next:** Redis read-counters via Upstash (needs
-Upstash) → reader accounts / newsletter / comments → editor analytics + deploy.
+**Next:** Redis read-counters via Upstash (Week 4) → editor analytics dashboard
++ accessibility/Lighthouse pass + deploy (Week 6).
 
 ## Setup
 

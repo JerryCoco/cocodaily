@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
 import { signIn, auth } from "@/auth";
@@ -27,8 +28,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <div className="mx-auto mt-16 max-w-sm px-4">
-      <h1 className="text-2xl font-extrabold">Sign in</h1>
-      <p className="mt-1 text-sm text-muted">Staff access to the newsroom.</p>
+      <h1 className="font-display text-2xl font-extrabold">Sign in</h1>
+      <p className="mt-1 text-sm text-muted">Readers and newsroom staff.</p>
 
       {error && (
         <p className="mt-4 rounded-md bg-accent/10 px-3 py-2 text-sm text-accent">
@@ -63,8 +64,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         </button>
       </form>
 
-      <p className="mt-4 text-xs text-muted">
-        Seeded editor: <code>ada@coco.test</code> / <code>password123</code>
+      <p className="mt-4 text-sm text-muted">
+        New here?{" "}
+        <Link href="/register" className="text-accent hover:underline">Create an account</Link>
+      </p>
+      <p className="mt-2 text-xs text-muted">
+        Seeded staff: <code>ada@coco.test</code> / <code>password123</code>
       </p>
     </div>
   );

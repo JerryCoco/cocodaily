@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { getSections } from "@/lib/queries";
+import { HeaderAccount } from "./header-account";
 
+// Stays static/ISR-friendly — the auth-dependent bit is <HeaderAccount/>, a
+// client component that reads /api/auth/session on its own.
 export async function SiteHeader() {
   const sections = await getSections();
+
   return (
     <header className="border-b border-line bg-surface">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4">
@@ -25,12 +29,7 @@ export async function SiteHeader() {
               className="w-40 rounded-md border border-line bg-bg px-3 py-1.5 text-sm outline-none focus:w-56 focus:border-accent"
             />
           </form>
-          <Link
-            href="/login"
-            className="rounded-md border border-line px-3 py-1.5 text-sm hover:bg-bg"
-          >
-            Sign in
-          </Link>
+          <HeaderAccount />
         </div>
       </div>
     </header>

@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { requireStaff } from "@/lib/auth-helpers";
+import { requireStaff, canPublish } from "@/lib/auth-helpers";
 import { signOut } from "@/auth";
 
 export default async function StudioLayout({ children }: LayoutProps<"/studio">) {
   const user = await requireStaff();
+  const isEditor = canPublish(user.role);
 
   return (
     <div className="flex min-h-screen">
       <aside className="flex w-56 flex-col border-r border-line bg-surface px-4 py-6">
-        <Link href="/" className="text-xl font-extrabold">
+        <Link href="/" className="font-display text-xl font-extrabold">
           Coco
         </Link>
         <p className="mt-1 text-xs text-muted">Newsroom</p>
@@ -16,6 +17,9 @@ export default async function StudioLayout({ children }: LayoutProps<"/studio">)
         <nav className="mt-6 flex flex-col gap-1 text-sm">
           <Link href="/studio" className="rounded-md px-3 py-2 hover:bg-bg">Articles</Link>
           <Link href="/studio/articles/new" className="rounded-md px-3 py-2 hover:bg-bg">New article</Link>
+          {isEditor && (
+            <Link href="/studio/comments" className="rounded-md px-3 py-2 hover:bg-bg">Comments</Link>
+          )}
         </nav>
 
         <div className="mt-auto border-t border-line pt-4 text-sm">
