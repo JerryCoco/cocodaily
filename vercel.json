@@ -1,6 +1,7 @@
 {
+  "$comment": "Vercel Hobby allows at most one run per day per cron. For real cadence (scheduled posts going live promptly, frequent view flushes) hit these endpoints from an external scheduler with the CRON_SECRET bearer token — see DEPLOY.md.",
   "crons": [
-    { "path": "/api/cron/publish", "schedule": "* * * * *" },
-    { "path": "/api/cron/flush-views", "schedule": "*/5 * * * *" }
+    { "path": "/api/cron/publish", "schedule": "0 6 * * *" },
+    { "path": "/api/cron/flush-views", "schedule": "30 6 * * *" }
   ]
 }
