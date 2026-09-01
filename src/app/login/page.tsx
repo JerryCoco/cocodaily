@@ -68,9 +68,6 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
         New here?{" "}
         <Link href="/register" className="text-accent hover:underline">Create an account</Link>
       </p>
-      <p className="mt-2 text-xs text-muted">
-        Seeded staff: <code>ada@coco.test</code> / <code>password123</code>
-      </p>
     </div>
   );
 }
