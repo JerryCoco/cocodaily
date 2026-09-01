@@ -17,8 +17,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Coco — Entertainment News",
-    template: "%s — Coco",
+    default: "Coco Entertainment — Movies, TV, Music & Celebrity",
+    template: "%s — Coco Entertainment",
   },
   description:
     "Movies, TV, music, and celebrity news, reviews, and awards coverage.",

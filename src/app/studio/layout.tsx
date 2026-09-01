@@ -10,7 +10,7 @@ export default async function StudioLayout({ children }: LayoutProps<"/studio">)
     <div className="flex min-h-screen">
       <aside className="flex w-56 flex-col border-r border-line bg-surface px-4 py-6">
         <Link href="/" className="font-display text-xl font-extrabold">
-          Coco
+          Coco Entertainment
         </Link>
         <p className="mt-1 text-xs text-muted">Newsroom</p>
 

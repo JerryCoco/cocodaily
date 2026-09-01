@@ -10,7 +10,7 @@
  * Safe to re-run: clears articles/media/comments/views first, keeps sections,
  * tags, users, and newsletter subscribers.
  */
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { slugify } from "../src/lib/slug";
 
 const prisma = new PrismaClient();
@@ -51,7 +51,7 @@ function toDoc(bodyText: string, sourceUrl: string) {
     .filter(Boolean)
     .slice(0, 6); // opening of the piece only
 
-  const content: unknown[] = paras.map((text) => ({
+  const content: Prisma.InputJsonValue[] = paras.map((text) => ({
     type: "paragraph",
     content: [{ type: "text", text }],
   }));
@@ -67,7 +67,7 @@ function toDoc(bodyText: string, sourceUrl: string) {
       { type: "text", text: "." },
     ],
   });
-  return { type: "doc", content };
+  return { type: "doc", content } as Prisma.InputJsonValue;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
