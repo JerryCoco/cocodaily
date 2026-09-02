@@ -55,7 +55,7 @@ export default async function HomePage() {
 
       {/* Latest per section */}
       {perSection.map(({ section, articles }) => (
-        <section key={section.slug}>
+        <section key={section.slug} className="reveal">
           <div
             className="mb-5 flex items-baseline justify-between border-b-2 pb-2"
             style={{ borderColor: section.color }}
@@ -63,9 +63,9 @@ export default async function HomePage() {
             <h2 className="font-display text-2xl font-extrabold">{section.name}</h2>
             <Link
               href={`/${section.slug}`}
-              className="text-sm font-medium text-muted hover:text-ink"
+              className="group text-sm font-medium text-muted hover:text-ink"
             >
-              More →
+              More <span className="inline-block transition-transform group-hover:translate-x-0.5">&rarr;</span>
             </Link>
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">

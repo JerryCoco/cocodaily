@@ -31,6 +31,15 @@ export default function RegisterPage() {
           <span className="text-muted">Password</span>
           <input name="password" type="password" required minLength={8} className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-accent" />
         </label>
+        <label className="flex items-start gap-2.5 rounded-md border border-line px-3 py-2.5 text-sm">
+          <input name="contributor" type="checkbox" className="mt-0.5 accent-accent" />
+          <span>
+            <span className="font-medium">I want to write for Coco</span>
+            <span className="mt-0.5 block text-xs text-muted">
+              Get a contributor account. You can draft articles right away; an editor publishes them.
+            </span>
+          </span>
+        </label>
         <button
           type="submit"
           disabled={pending}

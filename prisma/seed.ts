@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { PrismaClient, type ArticleStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -88,9 +89,15 @@ async function main() {
     prisma.user.deleteMany(),
   ]);
 
-  const passwordHash = await bcrypt.hash("password123", 10);
+  // Demo staff are content authors only — each gets an unusable random password
+  // so no one can log in as them. Real admin access comes from
+  // `npm run db:bootstrap-admin`; contributors self-register at /register.
   const users = await Promise.all(
-    STAFF.map((u) => prisma.user.create({ data: { ...u, passwordHash } })),
+    STAFF.map(async (u) =>
+      prisma.user.create({
+        data: { ...u, passwordHash: await bcrypt.hash(randomBytes(24).toString("hex"), 10) },
+      }),
+    ),
   );
   const sections = await Promise.all(
     SECTIONS.map((s) => prisma.section.create({ data: s })),
@@ -149,7 +156,7 @@ async function main() {
   }
 
   console.log(`seeded ${users.length} users, ${sections.length} sections, 44 articles (${n} published)`);
-  console.log("staff login: ada@coco.test / password123");
+  console.log("no demo logins — run `npm run db:bootstrap-admin` for admin access");
 }
 
 main()

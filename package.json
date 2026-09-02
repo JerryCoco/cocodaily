@@ -14,7 +14,9 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "db:import-feeds": "tsx prisma/import-feeds.ts",
-    "db:set-passwords": "tsx prisma/set-passwords.ts"
+    "db:set-passwords": "tsx prisma/set-passwords.ts",
+    "db:bootstrap-admin": "tsx prisma/bootstrap-admin.ts",
+    "db:retire-demo-staff": "tsx prisma/retire-demo-staff.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -34,6 +36,7 @@
     "cloudinary": "^2.11.0",
     "next": "16.3.3",
     "next-auth": "^5.0.0-beta.32",
+    "nodemailer": "^8.0.11",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "rss-parser": "^3.13.0",
@@ -43,6 +46,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

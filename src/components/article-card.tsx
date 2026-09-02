@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cldUrl } from "@/lib/cld-url";
+import { shimmerDataURL } from "@/lib/shimmer";
 
 type Card = {
   title: string;
@@ -15,24 +17,36 @@ const fmtDate = (d: Date | null) =>
   d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
 
 export function ArticleCard({ article, size = "md" }: { article: Card; size?: "md" | "lg" }) {
+  const cover = article.coverMedia;
+  const cld = cover?.publicId
+    ? cldUrl(cover.publicId, { w: size === "lg" ? 1600 : 800 })
+    : "";
+  const src = cover ? cld || cover.originalUrl : null;
+  const isCld = Boolean(cld);
+
   return (
     <article className="group flex flex-col">
       <Link
         href={`/article/${article.slug}`}
-        className={`img-skeleton block overflow-hidden rounded-lg ${
+        className={`img-skeleton relative block overflow-hidden rounded-lg ${
           size === "lg" ? "aspect-[16/9]" : "aspect-[3/2]"
         }`}
       >
-        {article.coverMedia && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={cldUrl(article.coverMedia.publicId, {
-              w: size === "lg" ? 1200 : 640,
-              fallbackUrl: article.coverMedia.originalUrl,
-            })}
-            alt={article.coverMedia.alt}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+        {src && (
+          <Image
+            src={src}
+            alt={cover!.alt}
+            fill
+            sizes={
+              size === "lg"
+                ? "(max-width: 768px) 100vw, 66vw"
+                : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            }
+            placeholder="blur"
+            blurDataURL={shimmerDataURL}
+            priority={size === "lg"}
+            unoptimized={isCld}
+            className="object-cover transition-transform duration-500 will-change-transform group-hover:scale-[1.04]"
           />
         )}
       </Link>
@@ -43,7 +57,7 @@ export function ArticleCard({ article, size = "md" }: { article: Card; size?: "m
         <span className="text-muted">· {fmtDate(article.publishedAt)}</span>
       </div>
       <h3 className={`font-display mt-1.5 font-bold leading-[1.15] ${size === "lg" ? "text-3xl" : "text-xl"}`}>
-        <Link href={`/article/${article.slug}`} className="hover:text-accent">
+        <Link href={`/article/${article.slug}`} className="transition-colors hover:text-accent">
           {article.title}
         </Link>
       </h3>

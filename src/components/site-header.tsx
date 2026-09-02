@@ -8,14 +8,17 @@ export async function SiteHeader() {
   const sections = await getSections();
 
   return (
-    <header className="border-b border-line bg-surface">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface/80 backdrop-blur-md supports-[backdrop-filter]:bg-surface/65">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4">
-        <Link href="/" className="font-display text-2xl font-extrabold">
+        <Link
+          href="/"
+          className="font-display text-2xl font-extrabold transition-transform hover:-translate-y-px"
+        >
           Coco
         </Link>
-        <nav aria-label="Sections" className="hidden gap-4 text-sm font-medium text-muted md:flex">
+        <nav aria-label="Sections" className="hidden gap-5 text-sm font-medium text-muted md:flex">
           {sections.map((s) => (
-            <Link key={s.slug} href={`/${s.slug}`} className="hover:text-ink">
+            <Link key={s.slug} href={`/${s.slug}`} className="nav-underline hover:text-ink">
               {s.name}
             </Link>
           ))}
@@ -27,7 +30,7 @@ export async function SiteHeader() {
               name="q"
               aria-label="Search articles"
               placeholder="Search…"
-              className="w-40 rounded-md border border-line bg-bg px-3 py-1.5 text-sm outline-none focus:w-56 focus:border-accent"
+              className="w-40 rounded-md border border-line bg-bg px-3 py-1.5 text-sm outline-none transition-[width,border-color] focus:w-56 focus:border-accent"
             />
           </form>
           <HeaderAccount />

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAuthor, getArticlePage } from "@/lib/queries";
@@ -28,8 +29,13 @@ export default async function AuthorPage({ params, searchParams }: PageProps<"/a
     <div>
       <header className="mb-8 flex items-center gap-4">
         {author.avatarUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={author.avatarUrl} alt={author.name ?? ""} className="h-16 w-16 rounded-full object-cover" />
+          <Image
+            src={author.avatarUrl}
+            alt={author.name ?? ""}
+            width={64}
+            height={64}
+            className="h-16 w-16 rounded-full object-cover"
+          />
         )}
         <div>
           <h1 className="font-display text-3xl font-extrabold">{author.name}</h1>

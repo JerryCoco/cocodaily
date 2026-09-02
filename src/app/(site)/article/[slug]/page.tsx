@@ -1,10 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getArticleBySlug, getRelatedArticles } from "@/lib/queries";
 import { RenderTiptap } from "@/lib/render-tiptap";
 import { readingTimeMinutes } from "@/lib/tiptap-text";
 import { cldUrl } from "@/lib/cld-url";
+import { shimmerDataURL } from "@/lib/shimmer";
 import { ArticleCard } from "@/components/article-card";
 import { SaveButton } from "@/components/save-button";
 import { Comments } from "@/components/comments";
@@ -80,17 +82,26 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
         <span className="ml-auto"><SaveButton articleId={article.id} /></span>
       </div>
 
-      {article.coverMedia && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={cldUrl(article.coverMedia.publicId, {
-            w: 1400,
-            fallbackUrl: article.coverMedia.originalUrl,
-          })}
-          alt={article.coverMedia.alt}
-          className="mt-6 w-full rounded-lg"
-        />
-      )}
+      {article.coverMedia && (() => {
+        const cld = article.coverMedia.publicId
+          ? cldUrl(article.coverMedia.publicId, { w: 1600 })
+          : "";
+        return (
+          <div className="img-skeleton relative mt-6 aspect-[16/9] overflow-hidden rounded-lg">
+            <Image
+              src={cld || article.coverMedia.originalUrl}
+              alt={article.coverMedia.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              placeholder="blur"
+              blurDataURL={shimmerDataURL}
+              priority
+              unoptimized={Boolean(cld)}
+              className="object-cover"
+            />
+          </div>
+        );
+      })()}
 
       <div className="mt-6">
         <RenderTiptap doc={article.body} />
