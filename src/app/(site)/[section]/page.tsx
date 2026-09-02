@@ -7,9 +7,12 @@ import { Pagination } from "@/components/pagination";
 
 export const revalidate = 300;
 
-export async function generateStaticParams() {
-  const sections = await prisma.section.findMany({ select: { slug: true } });
-  return sections.map((s) => ({ section: s.slug }));
+// Generated on first request, then ISR-cached for `revalidate` seconds — not
+// prerendered at build. Keeps a Neon blip during the Vercel build from failing
+// the whole deploy (section pages just warm up on their first hit instead).
+export const dynamicParams = true;
+export function generateStaticParams() {
+  return [] as { section: string }[];
 }
 
 export async function generateMetadata({

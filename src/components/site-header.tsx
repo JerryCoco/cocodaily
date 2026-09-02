@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSections } from "@/lib/queries";
 import { HeaderAccount } from "./header-account";
+import { MobileNav } from "./mobile-nav";
 
 // Stays static/ISR-friendly — the auth-dependent bit is <HeaderAccount/>, a
 // client component that reads /api/auth/session on its own.
@@ -8,7 +9,7 @@ export async function SiteHeader() {
   const sections = await getSections();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-surface/80 backdrop-blur-md supports-[backdrop-filter]:bg-surface/65">
+    <header className="sticky top-0 z-50 border-b border-line bg-surface/80 backdrop-blur-md supports-[backdrop-filter]:bg-surface/65">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4">
         <Link
           href="/"
@@ -34,6 +35,7 @@ export async function SiteHeader() {
             />
           </form>
           <HeaderAccount />
+          <MobileNav sections={sections} />
         </div>
       </div>
     </header>
