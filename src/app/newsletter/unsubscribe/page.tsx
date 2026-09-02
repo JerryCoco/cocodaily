@@ -30,7 +30,7 @@ export default async function UnsubscribePage({ searchParams }: PageProps<"/news
         href="/"
         className="mt-6 inline-block rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover"
       >
-        Back to Coco News
+        Back to Coco
       </Link>
     </div>
   );

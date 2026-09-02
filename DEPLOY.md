@@ -1,10 +1,10 @@
-# Deploying Coco to Vercel
+# Deploying Coco News to Vercel
 
 ## 1. Import the repo
 
 1. Push `main` to GitHub.
 2. [vercel.com](https://vercel.com) → **Add New… → Project** → import
-   `JerryCoco/entertainment-news`.
+   `JerryCoco/coco-news`.
 3. Framework preset: **Next.js** (auto-detected). Leave build/output settings
    default — `package.json`'s `build` script already runs
    `prisma generate && prisma migrate deploy && next build`.

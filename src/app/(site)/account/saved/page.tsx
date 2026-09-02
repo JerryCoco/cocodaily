@@ -43,7 +43,7 @@ export default async function SavedPage() {
         </div>
       )}
       <p className="mt-8 text-sm">
-        <Link href="/" className="text-accent hover:underline">← Back to Coco News</Link>
+        <Link href="/" className="text-accent hover:underline">← Back to Coco</Link>
       </p>
     </div>
   );

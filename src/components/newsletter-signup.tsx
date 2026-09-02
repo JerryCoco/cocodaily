@@ -8,7 +8,7 @@ export function NewsletterSignup() {
 
   return (
     <div>
-      <p className="font-display text-lg font-bold text-ink">The Coco News briefing</p>
+      <p className="font-display text-lg font-bold text-ink">The Coco briefing</p>
       <p className="mt-1 text-sm text-muted">The day's essential stories, once every morning.</p>
       <form action={action} className="mt-3 flex max-w-sm gap-2">
         <input
