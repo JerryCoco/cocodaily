@@ -11,7 +11,7 @@ export async function SiteHeader() {
     <header className="border-b border-line bg-surface">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4">
         <Link href="/" className="font-display text-2xl font-extrabold">
-          Coco Entertainment
+          Coco News
         </Link>
         <nav aria-label="Sections" className="hidden gap-4 text-sm font-medium text-muted md:flex">
           {sections.map((s) => (

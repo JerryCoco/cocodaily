@@ -40,9 +40,9 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>Coco Entertainment</title>
+    <title>Coco News</title>
     <link>${SITE}</link>
-    <description>Movies, TV, music, and celebrity news, reviews, and awards coverage.</description>
+    <description>News from Ghana and around the world.</description>
     <language>en</language>
 ${items}
   </channel>

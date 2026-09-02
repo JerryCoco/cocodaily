@@ -17,11 +17,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Coco Entertainment — Movies, TV, Music & Celebrity",
-    template: "%s — Coco Entertainment",
+    default: "Coco News — Ghana & the world, in one feed",
+    template: "%s — Coco News",
   },
   description:
-    "Movies, TV, music, and celebrity news, reviews, and awards coverage.",
+    "News from Ghana and around the world — politics, business, tech, sport and culture.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

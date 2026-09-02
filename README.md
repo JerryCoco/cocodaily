@@ -1,85 +1,95 @@
-# Coco — Entertainment News Platform
+# Coco News
 
-Flagship Project #1. Full spec:
-`C:\Projects\big-01-entertainment-news-platform.md`.
+A full-stack news platform: a fast, SEO-strong public site with an editorial CMS
+behind it. Staff draft, review, schedule and publish stories; readers browse by
+section, search, comment, save articles and subscribe to a briefing.
 
-An editorial CMS with a publishing workflow behind it and a fast, SEO-strong
-public site in front. Not a markdown blog — a multi-author newsroom tool.
+**Live:** https://coco-news.vercel.app &nbsp;·&nbsp; **Newsroom:** `/studio`
 
-## Stack
+> Portfolio project. Demo content is pulled from The Guardian's Open Platform and
+> Ghanaian newsroom RSS feeds, shown as attributed excerpts that link back to the
+> original — the platform is the work, not the copy.
 
-Next.js 16 (App Router) · React 19 · Prisma 6 + PostgreSQL (Neon) · Redis
-(Upstash) · Auth.js v5 · Tailwind v4 · Cloudinary (images).
+---
 
-## Status
+## What it does
 
-**All 6 build weeks done.** Only the Vercel deploy remains — see `DEPLOY.md`.
+**Public site**
+- Curated home page — lead story, trending rail, latest per section
+- Sections (Ghana, Africa, World, Business, Tech, Sport, Culture), author pages,
+  tag pages — all paginated
+- Full-text search (PostgreSQL `tsvector` + GIN, relevance-ranked)
+- Reader accounts: comment, save-for-later, newsletter subscribe / one-click
+  unsubscribe
+- RSS feed, `sitemap.xml`, `robots.txt`, `NewsArticle` JSON-LD, Open Graph,
+  reading-time estimates
 
-**Data & auth** — Prisma schema (User+role, Section, Tag, Article+status,
-Revision, Media, Comment, SavedArticle, NewsletterSubscriber, Auth.js models) on
-Neon. Auth.js v5 split config (`auth.config.ts` edge-safe + `auth.ts`),
-Credentials + JWT, `role` on the session. `proxy.ts` gates `/studio`.
+**Newsroom CMS** (`/studio`, role-gated)
+- Tiptap rich-text editor; body stored as structured JSON, not HTML
+- Workflow: `draft → in review → scheduled → published → archived`, enforced
+  per role (writers touch only their own drafts; editors publish anything)
+- Revision history with restore; scheduled publishing via cron
+- Cover-image upload straight to Cloudinary (alt text required), delivered
+  through `f_auto,q_auto` transform URLs
+- Comment moderation queue with spam heuristics
+- Analytics dashboard — views over 30 days, top articles, subscriber growth,
+  comment breakdown (hand-rolled SVG charts, no chart library)
 
-**Public site** — home (hero + trending + per-section rails), `/[section]`,
-`/article/[slug]` (`NewsArticle` JSON-LD, OG, reading time), `/author/[id]`,
-`/tag/[slug]`, all paginated. `/search` — Postgres full-text search (generated
-`searchVector` tsvector + GIN index, weighted title/excerpt/body,
-`ts_rank`-ordered). `/feed.xml` RSS, `sitemap.xml`, `robots.txt`. Strict
-allow-list Tiptap JSON → React renderer.
+## Architecture highlights
 
-**Newsroom CMS** (`/studio`) — article list with status filters, Tiptap editor,
-create/edit with server actions (zod, unique slug, tag upsert), workflow state
-machine (`draft → in review → scheduled → published → archived`) with per-role
-rules, revision history + restore, on-demand `revalidatePath` on
-publish/edit. **Cover-image upload** — auth-gated `/api/media/upload` streams to
-Cloudinary (folder `coco/`), alt text required; `cldUrl()` builds
-`f_auto,q_auto,w_*` transform URLs for cards and heroes; paste-a-URL still works
-as a fallback. `/api/cron/publish` flips due scheduled articles (Vercel Cron in
-`vercel.json`). **Analytics** (`/studio/analytics`, editor-only) — views over 30
-days (from a `ViewDaily` rollup the flush cron writes), top articles, subscriber
-growth, comment breakdown, most-saved; hand-rolled SVG charts, no chart lib.
+| Concern | Approach |
+|---|---|
+| **Read-heavy traffic** | Article/section pages are ISR-cached; publishing fires `revalidatePath` so a change is live in seconds without a rebuild |
+| **View counts** | Increment in Redis per request; a cron flushes them to Postgres in a batch — a viral article never writes to the DB on the hot path |
+| **Auth on the edge** | Split Auth.js config — `auth.config.ts` (no adapter/bcrypt) runs in `proxy.ts`; the full config with the Prisma adapter runs only in Node |
+| **Rich-text safety** | Tiptap JSON rendered through a fixed allow-list of node types — never `dangerouslySetInnerHTML` on pasted content |
+| **Abuse** | Upstash sliding-window rate limits on register / comment / newsletter / upload |
+| **Media** | Signed upload route → Cloudinary; only `public_id` + dimensions stored; responsive sizes are URL transforms |
 
-**Caching / Redis (Upstash)** — article views count in Redis (`<ViewPing>` →
-`/api/articles/[id]/view`), `/api/cron/flush-views` folds them into Postgres
-every 5 min so views never hit the DB on the hot path. `getHomeData()` has a 60s
-Redis read-through cache. Sliding-window rate limits on comments / newsletter /
-register / uploads. All Redis calls no-op without the Upstash env vars.
+## Tech stack
 
-**Readers** — `/register` + `/login` (Auth.js Credentials, role `READER`).
-Newsletter subscribe (footer) + one-click `/newsletter/unsubscribe`.
-Save-for-later (`☆`/`★` on articles → `/account/saved`). Comments: signed-in
-readers post, `src/lib/spam.ts` heuristics + a trust rule route new comments to a
-moderation queue (`/studio/comments`, editor-only) with approve / reject / spam /
-delete. The article page stays ISR — reader-specific bits load client-side from
-`/api/reader/context`.
+Next.js 16 (App Router) · React 19 · TypeScript · Prisma 6 + PostgreSQL (Neon) ·
+Redis (Upstash) · Auth.js v5 · Tailwind CSS v4 · Cloudinary · Tiptap ·
+deployed on Vercel.
 
-**Design** — tokens in `globals.css` `@theme` (neutrals, one accent, per-section
-colors, CMS status colors, editorial type scale) + **Fraunces** display serif on
-headlines.
-
-Seed: 4 staff, 6 sections, 8 tags, 44 articles (~37 published). Staff login:
-`ada@coco.test` / `password123`.
-
-**Next:** deploy to Vercel (`DEPLOY.md`), then swap the seeded passwords.
-
-## Setup
+## Run it locally
 
 ```bash
+git clone https://github.com/JerryCoco/coco-news
+cd coco-news
 npm install
-# put your Neon connection string in .env  (DATABASE_URL)
-npm run db:migrate      # create tables
-npm run db:seed         # demo content
-npm run dev             # http://localhost:3000
+cp .env.example .env        # fill in the values below
+npm run db:migrate          # apply the schema
+npm run db:seed             # demo content, or:
+GUARDIAN_API_KEY=xxx npm run db:import-feeds   # real content from live feeds
+npm run dev                 # http://localhost:3000
 ```
 
-Seeded staff login: `ada@coco.test` / `password123` (`/studio` for the CMS)
+**Environment** (`.env`)
+
+| Key | For |
+|---|---|
+| `DATABASE_URL` / `DIRECT_URL` | Neon Postgres (pooled + direct) |
+| `AUTH_SECRET` | Auth.js session signing |
+| `NEXT_PUBLIC_SITE_URL` | canonical URLs, RSS, OG |
+| `CLOUDINARY_*` + `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | image storage |
+| `UPSTASH_REDIS_REST_URL` / `_TOKEN` | caching + rate limiting |
+| `CRON_SECRET` | bearer token for the cron routes |
+| `GUARDIAN_API_KEY` | optional — content import only |
+
+Seeded staff login: `ada@coco.test` / `password123` (change before sharing).
 
 ## Scripts
 
-| Script | Does |
+| | |
 |---|---|
-| `npm run dev` | Next dev server |
+| `npm run dev` / `build` / `start` | Next.js |
 | `npm run db:migrate` | `prisma migrate dev` |
-| `npm run db:seed` | load demo content |
-| `npm run db:studio` | Prisma Studio (browse the DB) |
-| `npm run build` | production build |
+| `npm run db:seed` | synthetic demo content |
+| `npm run db:import-feeds` | real content from Guardian + Ghana RSS |
+| `npm run db:studio` | Prisma Studio |
+
+## Deploy
+
+See [`DEPLOY.md`](./DEPLOY.md) — Vercel + Neon + Upstash + Cloudinary, all free
+tiers. Cron cadence note included (Vercel Hobby throttles cron to daily).

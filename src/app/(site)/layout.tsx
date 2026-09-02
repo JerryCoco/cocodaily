@@ -10,9 +10,9 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
       <footer className="border-t border-line bg-surface">
         <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="font-display text-lg font-extrabold text-ink">Coco Entertainment</p>
+            <p className="font-display text-lg font-extrabold text-ink">Coco News</p>
             <p className="mt-1 text-sm text-muted">
-              Entertainment news, reviews, and awards coverage.
+              News from Ghana and around the world.
             </p>
             <p className="mt-3 text-sm">
               <Link href="/feed.xml" className="text-muted hover:text-ink">RSS</Link>

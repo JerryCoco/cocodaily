@@ -4,44 +4,45 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const SECTIONS = [
-  { name: "Movies", slug: "movies", color: "#7c3aed" },
-  { name: "TV", slug: "tv", color: "#2563eb" },
-  { name: "Music", slug: "music", color: "#db2777" },
-  { name: "Celebrity", slug: "celebrity", color: "#d97706" },
-  { name: "Reviews", slug: "reviews", color: "#059669" },
-  { name: "Awards", slug: "awards", color: "#b45309" },
+  { name: "Ghana", slug: "ghana", color: "#ce1126" },
+  { name: "Africa", slug: "africa", color: "#d97706" },
+  { name: "World", slug: "world", color: "#2563eb" },
+  { name: "Business", slug: "business", color: "#059669" },
+  { name: "Tech", slug: "tech", color: "#7c3aed" },
+  { name: "Sport", slug: "sport", color: "#ea580c" },
+  { name: "Culture", slug: "culture", color: "#db2777" },
 ];
 
 const STAFF = [
-  { name: "Ada Obi", email: "ada@coco.test", role: "EDITOR" as const, bio: "Editor-in-chief. Covers film and awards season." },
-  { name: "Tunde Bello", email: "tunde@coco.test", role: "WRITER" as const, bio: "Staff writer on music and nightlife." },
-  { name: "Chika Nwosu", email: "chika@coco.test", role: "WRITER" as const, bio: "TV and streaming reporter." },
+  { name: "Ama Serwaa", email: "ada@coco.test", role: "EDITOR" as const, bio: "Editor-in-chief. Runs the desk." },
+  { name: "Kojo Mensah", email: "tunde@coco.test", role: "WRITER" as const, bio: "Business and markets reporter." },
+  { name: "Nana Adjei", email: "chika@coco.test", role: "WRITER" as const, bio: "Politics and Africa correspondent." },
   { name: "Sam Reyes", email: "sam@coco.test", role: "ADMIN" as const, bio: "Founder. Keeps the lights on." },
 ];
 
-const TAGS = ["interview", "box-office", "trailer", "review", "red-carpet", "streaming", "exclusive", "ranked"];
+const TAGS = ["analysis", "explainer", "exclusive", "interview", "live", "opinion", "data", "profile"];
 
 const HEADLINES = [
-  "The sequel nobody asked for is quietly the best film of the year",
-  "Inside the writers' room of this season's breakout drama",
-  "A pop star reinvents herself, again — and it works",
-  "Five minutes with the director everyone is talking about",
-  "The streaming wars have a new front, and it's animation",
-  "Why this low-budget horror is outgrossing the blockbusters",
-  "An awards campaign that started a year too early",
-  "The soundtrack is the real star of this one",
-  "A reunion tour, a legal fight, and one very expensive guitar",
-  "This documentary will change how you see the franchise",
-  "The comedy special that split the internet in half",
-  "How a canceled show found a second life abroad",
-  "The biopic gets the music right and the timeline wrong",
-  "A festival breakout lands the biggest deal of the year",
-  "The finale everyone predicted, executed better than anyone expected",
-  "Casting news that quietly rewrites the whole sequel",
-  "The director's cut is three hours longer and somehow tighter",
-  "A veteran actor's quietest performance is their loudest statement",
-  "The album leaked, the tour sold out anyway",
-  "Behind the year's most divisive needle drop",
+  "Cedi steadies as central bank signals a hold on rates",
+  "Inside the port expansion set to reshape regional trade",
+  "A quiet revolution in the country's mobile-money rails",
+  "Parliament returns to a packed order paper and a thin majority",
+  "The startup turning cocoa waste into a export business",
+  "Drought pushes food prices to a two-year high",
+  "How a small town became the country's solar test bed",
+  "The diaspora bond that raised more than anyone expected",
+  "A landmark ruling reshapes land disputes overnight",
+  "Regional leaders meet as a border standoff drags on",
+  "The league's breakout season, explained in five charts",
+  "Why this year's budget leans hard on domestic revenue",
+  "A new undersea cable promises faster, cheaper internet",
+  "The health drive that cut malaria cases by a third",
+  "Fintechs push into lending as banks pull back",
+  "A generation of engineers is choosing to stay",
+  "The heritage site caught between tourism and preservation",
+  "Election officials trial a new voter-verification system",
+  "The film that put the local industry on the festival map",
+  "Farmers adopt drought-resistant seed as rains fail again",
 ];
 
 const para = (text: string) => ({ type: "paragraph", content: [{ type: "text", text }] });
