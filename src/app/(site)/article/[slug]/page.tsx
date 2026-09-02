@@ -55,7 +55,7 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
   };
 
   return (
-    <article className="mx-auto max-w-2xl">
+    <article className="mx-auto max-w-[42rem]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -63,23 +63,36 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
 
       <Link
         href={`/${article.section.slug}`}
-        className="text-sm font-bold uppercase tracking-wide"
+        className="kicker inline-flex items-center gap-1.5 hover:opacity-70"
         style={{ color: article.section.color }}
       >
+        <span
+          className="h-1.5 w-1.5 rounded-full"
+          style={{ backgroundColor: article.section.color }}
+        />
         {article.section.name}
       </Link>
-      <h1 className="font-display mt-2 text-4xl font-extrabold leading-[1.1]">{article.title}</h1>
-      {article.excerpt && <p className="mt-3 text-xl text-muted">{article.excerpt}</p>}
+      <h1 className="font-display mt-3 text-4xl font-extrabold md:text-5xl">{article.title}</h1>
+      {article.excerpt && (
+        <p className="mt-4 text-xl leading-snug text-ink-soft">{article.excerpt}</p>
+      )}
 
-      <div className="mt-4 flex flex-wrap items-center gap-2 border-y border-line py-3 text-sm text-muted">
+      <div className="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1 border-y border-line py-3.5 text-sm text-muted">
         {article.author.name && (
-          <Link href={`/author/${article.author.id}`} className="font-medium text-ink hover:text-accent">
+          <Link
+            href={`/author/${article.author.id}`}
+            className="font-semibold text-ink hover:text-accent"
+          >
             {article.author.name}
           </Link>
         )}
-        <span>· {fmtDate(article.publishedAt)}</span>
-        <span>· {readingTimeMinutes(article.plainText)} min read</span>
-        <span className="ml-auto"><SaveButton articleId={article.id} /></span>
+        <span aria-hidden className="h-1 w-1 rounded-full bg-line-strong" />
+        <span>{fmtDate(article.publishedAt)}</span>
+        <span aria-hidden className="h-1 w-1 rounded-full bg-line-strong" />
+        <span>{readingTimeMinutes(article.plainText)} min read</span>
+        <span className="ml-auto">
+          <SaveButton articleId={article.id} />
+        </span>
       </div>
 
       {article.coverMedia && (() => {
@@ -87,23 +100,23 @@ export default async function ArticlePage({ params }: PageProps<"/article/[slug]
           ? cldUrl(article.coverMedia.publicId, { w: 1600 })
           : "";
         return (
-          <div className="img-skeleton relative mt-6 aspect-[16/9] overflow-hidden rounded-lg">
+          <figure className="img-skeleton relative mt-6 aspect-[16/9] overflow-hidden rounded-card ring-1 ring-line">
             <Image
               src={cld || article.coverMedia.originalUrl}
               alt={article.coverMedia.alt}
               fill
-              sizes="(max-width: 768px) 100vw, 768px"
+              sizes="(max-width: 768px) 100vw, 672px"
               placeholder="blur"
               blurDataURL={shimmerDataURL}
               priority
               unoptimized={Boolean(cld)}
               className="object-cover"
             />
-          </div>
+          </figure>
         );
       })()}
 
-      <div className="mt-6">
+      <div className="mt-8 text-[1.125rem] leading-[1.75]">
         <RenderTiptap doc={article.body} />
       </div>
 

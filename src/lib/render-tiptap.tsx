@@ -51,19 +51,22 @@ function renderNode(node: Node, key: number): ReactNode {
     case "doc":
       return <Fragment key={key}>{kids}</Fragment>;
     case "paragraph":
-      return <p key={key} className="my-4 leading-7 text-lg">{kids}</p>;
+      return <p key={key} className="my-5 text-ink-soft">{kids}</p>;
     case "heading": {
       const level = Number(node.attrs?.level ?? 2);
-      const cls = level <= 2 ? "text-2xl mt-8 mb-3 font-bold" : "text-xl mt-6 mb-2 font-bold";
+      const cls =
+        level <= 2
+          ? "font-display text-2xl mt-10 mb-3 font-bold"
+          : "font-display text-xl mt-8 mb-2 font-bold";
       const Tag = (`h${Math.min(Math.max(level, 2), 4)}`) as "h2" | "h3" | "h4";
       return <Tag key={key} className={cls}>{kids}</Tag>;
     }
     case "bulletList":
-      return <ul key={key} className="my-4 list-disc pl-6 space-y-1">{kids}</ul>;
+      return <ul key={key} className="my-5 list-disc space-y-1.5 pl-6 text-ink-soft">{kids}</ul>;
     case "orderedList":
-      return <ol key={key} className="my-4 list-decimal pl-6 space-y-1">{kids}</ol>;
+      return <ol key={key} className="my-5 list-decimal space-y-1.5 pl-6 text-ink-soft">{kids}</ol>;
     case "listItem":
-      return <li key={key} className="text-lg leading-7">{kids}</li>;
+      return <li key={key} className="pl-1">{kids}</li>;
     case "blockquote":
       return (
         <blockquote key={key} className="my-6 border-l-4 border-accent pl-4 text-xl italic text-muted">

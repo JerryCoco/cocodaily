@@ -9,22 +9,30 @@ export async function SiteHeader() {
   const sections = await getSections();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-surface/80 backdrop-blur-md supports-[backdrop-filter]:bg-surface/65">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-4">
+    <header className="sticky top-0 z-50 border-b border-line bg-surface/85 backdrop-blur-md supports-[backdrop-filter]:bg-surface/70">
+      {/* masthead rule */}
+      <div className="h-[3px] bg-accent" />
+
+      <div className="mx-auto flex max-w-5xl items-center gap-x-6 px-4 py-3 md:py-4">
         <Link
           href="/"
-          className="font-display text-2xl font-extrabold transition-transform hover:-translate-y-px"
+          className="font-display text-[1.6rem] font-extrabold leading-none tracking-tight md:text-3xl"
         >
           Coco
         </Link>
-        <nav aria-label="Sections" className="hidden gap-5 text-sm font-medium text-muted md:flex">
+
+        <nav
+          aria-label="Sections"
+          className="hidden gap-5 text-sm font-medium text-muted md:flex"
+        >
           {sections.map((s) => (
             <Link key={s.slug} href={`/${s.slug}`} className="nav-underline hover:text-ink">
               {s.name}
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <form action="/search" role="search" className="hidden sm:block">
             <input
               type="search"

@@ -1,28 +1,23 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Design tokens — see C:\Projects\big-01-entertainment-news-platform.md
-   Public site: bold + editorial. One vivid accent, per-section color coding.
+   Cocodaily design system — crisp editorial. One vivid accent (crimson),
+   per-section colour coding pulled live from the DB. Mobile-first.
    --------------------------------------------------------------------------- */
 @theme {
-  /* neutrals */
-  --color-bg: #faf9f7;
+  /* neutrals — warm paper */
+  --color-bg: #fbfaf8;
   --color-surface: #ffffff;
-  --color-ink: #1a1a1a;
-  --color-muted: #6b7280;
-  --color-line: #e7e5e4;
+  --color-ink: #17140f;
+  --color-ink-soft: #46403a;
+  --color-muted: #7c7469;
+  --color-line: #ebe6df;
+  --color-line-strong: #ddd6cc;
 
   /* accent */
   --color-accent: #e11d48;
   --color-accent-hover: #be123c;
-
-  /* per-section color coding */
-  --color-movies: #7c3aed;
-  --color-tv: #2563eb;
-  --color-music: #db2777;
-  --color-celebrity: #d97706;
-  --color-reviews: #059669;
-  --color-awards: #b45309;
+  --color-accent-tint: #fdeef1;
 
   /* editorial workflow status (CMS) */
   --color-status-draft: #6b7280;
@@ -31,16 +26,19 @@
   --color-status-published: #059669;
   --color-status-archived: #94a3b8;
 
-  /* editorial type scale: 14 / 16 / 18 / 22 / 28 / 40 / 56 */
+  /* fluid editorial type scale */
   --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.375rem;
-  --text-2xl: 1.75rem;
-  --text-3xl: 2.5rem;
-  --text-4xl: 3.5rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: clamp(1.25rem, 1.12rem + 0.6vw, 1.4rem);
+  --text-2xl: clamp(1.45rem, 1.2rem + 1.2vw, 1.85rem);
+  --text-3xl: clamp(1.8rem, 1.4rem + 2vw, 2.6rem);
+  --text-4xl: clamp(2.2rem, 1.6rem + 3vw, 3.4rem);
+  --text-5xl: clamp(2.6rem, 1.8rem + 4vw, 4.25rem);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 0.75rem;
 }
 
 :root {
@@ -55,24 +53,33 @@ html {
   scroll-behavior: smooth;
 }
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  overflow-wrap: break-word;
 }
 
 /* Editorial headlines use the display serif. */
 .font-display {
   font-family: var(--display-family);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
   text-wrap: balance;
 }
 
-p { text-wrap: pretty; }
+p {
+  text-wrap: pretty;
+}
 
 ::selection {
   background: color-mix(in oklab, var(--color-accent) 22%, transparent);
@@ -82,14 +89,35 @@ p { text-wrap: pretty; }
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
-/* Links and buttons ease their color changes. */
+/* Links and buttons ease their state changes. */
 a,
 button {
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease,
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
     opacity 0.15s ease;
+}
+
+/* --- Small caps section label ------------------------------------------------ */
+.kicker {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+/* --- Touch press feedback (mobile) ---------------------------------------- */
+.press {
+  transition: transform 0.12s ease;
+}
+@media (hover: none) {
+  .press:active {
+    transform: scale(0.985);
+  }
 }
 
 /* --- Sliding underline for nav links --------------------------------------- */
@@ -101,7 +129,7 @@ button {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -4px;
+  bottom: -5px;
   height: 2px;
   background: currentColor;
   transform: scaleX(0);
@@ -120,14 +148,14 @@ button {
     .reveal {
       animation: reveal-fade-up linear both;
       animation-timeline: view();
-      animation-range: entry 0% cover 22%;
+      animation-range: entry 2% cover 20%;
     }
   }
 }
 @keyframes reveal-fade-up {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -135,9 +163,31 @@ button {
   }
 }
 
-/* Cover-image placeholder while the real image loads. */
+/* --- Mobile nav panel drop-in ------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .panel-in {
+    animation: panel-in 0.18s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+}
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- Cover-image shimmer while loading ----------------------------------- */
 .img-skeleton {
-  background: linear-gradient(100deg, #edeae6 30%, #f4f2ef 50%, #edeae6 70%);
+  background: linear-gradient(
+    100deg,
+    color-mix(in oklab, var(--color-line) 65%, var(--color-bg)) 30%,
+    var(--color-bg) 50%,
+    color-mix(in oklab, var(--color-line) 65%, var(--color-bg)) 70%
+  );
   background-size: 200% 100%;
   animation: img-skeleton-pan 1.4s ease-in-out infinite;
 }

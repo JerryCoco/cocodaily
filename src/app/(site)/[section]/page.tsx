@@ -35,16 +35,22 @@ export default async function SectionPage({ params, searchParams }: PageProps<"/
 
   return (
     <div>
-      <h1
-        className="font-display mb-6 border-b-2 pb-2 text-4xl font-extrabold"
-        style={{ borderColor: row.color }}
-      >
-        {row.name}
-      </h1>
+      <header className="mb-8">
+        <p className="kicker flex items-center gap-1.5 text-muted">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: row.color }} />
+          Section
+        </p>
+        <h1 className="font-display mt-2 text-4xl font-extrabold md:text-5xl">{row.name}</h1>
+        <span
+          className="mt-3 block h-[3px] w-14 rounded"
+          style={{ backgroundColor: row.color }}
+        />
+      </header>
+
       {items.length === 0 ? (
         <p className="text-muted">Nothing published in {row.name} yet.</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((a) => (
             <ArticleCard key={a.slug} article={a} />
           ))}

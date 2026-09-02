@@ -8,8 +8,10 @@ export function NewsletterSignup() {
 
   return (
     <div>
-      <p className="font-display text-lg font-bold text-ink">The Coco briefing</p>
-      <p className="mt-1 text-sm text-muted">The day's essential stories, once every morning.</p>
+      <p className="font-display text-lg font-bold">The Coco briefing</p>
+      <p className="mt-1 text-sm text-muted">
+        The day&apos;s essential stories, once every morning.
+      </p>
       <form action={action} className="mt-3 flex max-w-sm gap-2">
         <input
           type="email"
@@ -17,18 +19,20 @@ export function NewsletterSignup() {
           required
           aria-label="Email address for the newsletter"
           placeholder="you@example.com"
-          className="flex-1 rounded-md border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
+          className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3.5 py-2 text-sm outline-none focus:border-accent"
         />
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
+          className="press shrink-0 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
         >
           {pending ? "…" : "Subscribe"}
         </button>
       </form>
       {state && (
-        <p className={`mt-2 text-xs ${state.ok ? "text-success" : "text-error"}`}>{state.message}</p>
+        <p className={`mt-2 text-xs ${state.ok ? "text-emerald-700" : "text-accent"}`}>
+          {state.message}
+        </p>
       )}
     </div>
   );
