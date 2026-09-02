@@ -5,6 +5,8 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authConfig } from "@/auth.config";
+import { sendMail } from "@/lib/mail";
+import { newSignIn } from "@/lib/mail-templates";
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -15,6 +17,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
+  events: {
+    async signIn({ user }) {
+      if (!user?.email) return;
+      try {
+        const row = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { name: true, createdAt: true },
+        });
+        // Skip for a just-created account — they already got a welcome email.
+        if (row && Date.now() - row.createdAt.getTime() > 2 * 60_000) {
+          await sendMail({
+            to: user.email,
+            ...newSignIn({ name: row.name ?? "there", when: new Date() }),
+          });
+        }
+      } catch (err) {
+        console.error("[auth] sign-in notification failed", err);
+      }
+    },
+  },
   providers: [
     Credentials({
       credentials: { email: {}, password: {} },

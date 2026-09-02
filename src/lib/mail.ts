@@ -13,7 +13,7 @@ const USER = process.env.SMTP_USER;
 const PASS = process.env.SMTP_PASS;
 
 export const MAIL_FROM =
-  process.env.MAIL_FROM || "Coco News <no-reply@coco.news>";
+  process.env.MAIL_FROM || "Cocodaily <no-reply@cocodaily.vercel.app>";
 
 export const mailEnabled = Boolean(HOST && USER && PASS);
 

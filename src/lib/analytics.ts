@@ -19,7 +19,7 @@ export async function getAnalyticsOverview() {
   const [agg, published, subscribers, comments, pending, saves] = await Promise.all([
     prisma.article.aggregate({ _sum: { viewCount: true } }),
     prisma.article.count({ where: { status: "PUBLISHED" } }),
-    prisma.newsletterSubscriber.count(),
+    prisma.newsletterSubscriber.count({ where: { confirmedAt: { not: null } } }),
     prisma.comment.count(),
     prisma.comment.count({ where: { status: "PENDING" } }),
     prisma.savedArticle.count(),
@@ -59,7 +59,7 @@ export async function getSubscriberSeries(days = 30) {
   since.setUTCHours(0, 0, 0, 0);
 
   const subs = await prisma.newsletterSubscriber.findMany({
-    where: { createdAt: { gte: since } },
+    where: { createdAt: { gte: since }, confirmedAt: { not: null } },
     select: { createdAt: true },
   });
   const counts = new Map<string, number>();
