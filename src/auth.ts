@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import type { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { authConfig } from "@/auth.config";
 import { sendMail } from "@/lib/mail";
@@ -13,10 +14,38 @@ const credentialsSchema = z.object({
   password: z.string().min(1),
 });
 
+const SEEN_THROTTLE_MS = 10 * 60_000;
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
+  callbacks: {
+    ...authConfig.callbacks,
+    async jwt({ token, user, trigger }) {
+      if (user) {
+        token.role = (user as { role: Role }).role;
+        token.uid = user.id as string;
+      } else if (trigger === "update" && token.uid) {
+        // e.g. a reader who just upgraded to contributor — refresh role from DB
+        const fresh = await prisma.user.findUnique({
+          where: { id: token.uid as string },
+          select: { role: true },
+        });
+        if (fresh) token.role = fresh.role;
+      }
+
+      // Throttled last-seen bump — powers /studio/users. Fire-and-forget.
+      const now = Date.now();
+      if (token.uid && now - ((token.seenAt as number | undefined) ?? 0) > SEEN_THROTTLE_MS) {
+        token.seenAt = now;
+        void prisma.user
+          .update({ where: { id: token.uid as string }, data: { lastSeenAt: new Date() } })
+          .catch(() => {});
+      }
+      return token;
+    },
+  },
   events: {
     async signIn({ user }) {
       if (!user?.email) return;

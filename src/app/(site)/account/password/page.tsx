@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { PasswordField } from "@/components/password-field";
 import { changePassword } from "./actions";
-
-const field =
-  "mt-1 w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-accent";
 
 export default function ChangePasswordPage() {
   const [state, action, pending] = useActionState(changePassword, {});
@@ -25,18 +23,9 @@ export default function ChangePasswordPage() {
       )}
 
       <form action={action} className="mt-6 flex flex-col gap-4">
-        <label className="text-sm">
-          <span className="text-muted">Current password</span>
-          <input name="current" type="password" required className={field} />
-        </label>
-        <label className="text-sm">
-          <span className="text-muted">New password</span>
-          <input name="next" type="password" required minLength={10} className={field} />
-        </label>
-        <label className="text-sm">
-          <span className="text-muted">Confirm new password</span>
-          <input name="confirm" type="password" required minLength={10} className={field} />
-        </label>
+        <PasswordField name="current" label="Current password" required autoComplete="current-password" />
+        <PasswordField name="next" label="New password" required minLength={10} autoComplete="new-password" />
+        <PasswordField name="confirm" label="Confirm new password" required minLength={10} autoComplete="new-password" />
         <button
           type="submit"
           disabled={pending}

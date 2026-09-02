@@ -31,6 +31,7 @@ model User {
   bio          String?
   avatarUrl    String?
   createdAt    DateTime @default(now())
+  lastSeenAt   DateTime? // bumped from /api/auth/session; powers the admin Users view
 
   articles  Article[]  @relation("ArticleAuthor")
   revisions Revision[]
@@ -38,6 +39,18 @@ model User {
   saves     SavedArticle[]
   accounts  Account[]
   sessions  Session[]
+}
+
+/// Forgot-password tokens. Only the sha256 hash of the token is stored, so a DB
+/// leak can't be used to reset anyone's password. Rows are one-time and expire.
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 // ---------------------------------------------------------------------------
@@ -84,6 +97,7 @@ model Article {
   publishedAt  DateTime?
   scheduledFor DateTime?
   viewCount    Int           @default(0)
+  sourceUrl    String? // canonical origin URL for feed-imported items; lets sync skip dupes
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 

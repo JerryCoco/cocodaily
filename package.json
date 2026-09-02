@@ -16,7 +16,8 @@
     "db:import-feeds": "tsx prisma/import-feeds.ts",
     "db:set-passwords": "tsx prisma/set-passwords.ts",
     "db:bootstrap-admin": "tsx prisma/bootstrap-admin.ts",
-    "db:retire-demo-staff": "tsx prisma/retire-demo-staff.ts"
+    "db:retire-demo-staff": "tsx prisma/retire-demo-staff.ts",
+    "db:sync-feeds": "tsx prisma/sync-feeds.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

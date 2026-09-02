@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/cron/publish", "schedule": "0 6 * * *" },
-    { "path": "/api/cron/flush-views", "schedule": "30 6 * * *" }
+    { "path": "/api/cron/flush-views", "schedule": "30 6 * * *" },
+    { "path": "/api/cron/sync-feeds", "schedule": "0 5 * * *" }
   ]
 }

@@ -292,6 +292,7 @@ async function main() {
           status: "PUBLISHED",
           publishedAt: d.publishedAt,
           viewCount,
+          sourceUrl: d.sourceUrl,
           section: { connect: { id: sectionId } },
           author: { connect: { id: author } },
           coverMedia: d.image ? { create: { originalUrl: d.image, alt: d.title } } : undefined,

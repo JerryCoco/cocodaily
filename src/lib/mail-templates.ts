@@ -89,6 +89,18 @@ export function passwordChanged(name: string): Omit<Mail, "to"> {
   };
 }
 
+export function passwordReset(opts: { name: string; url: string }): Omit<Mail, "to"> {
+  return {
+    subject: "Reset your Cocodaily password",
+    html: shell("Reset your password", [
+      p(`Hi ${opts.name}, someone asked to reset the password on this account.`),
+      button(opts.url, "Choose a new password"),
+      p(`<span style="color:#8a8a86;font-size:12px">This link works once and expires in 1 hour. If you didn't ask for it, ignore this email — your password stays the same.</span>`),
+    ].join("")),
+    text: `Reset your Cocodaily password (expires in 1 hour): ${opts.url}`,
+  };
+}
+
 export function newSignIn(opts: { name: string; when: Date }): Omit<Mail, "to"> {
   const when = opts.when.toLocaleString("en-GB", {
     dateStyle: "medium",

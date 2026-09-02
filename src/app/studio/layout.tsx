@@ -5,6 +5,7 @@ import { signOut } from "@/auth";
 export default async function StudioLayout({ children }: LayoutProps<"/studio">) {
   const user = await requireStaff();
   const isEditor = canPublish(user.role);
+  const isAdmin = user.role === "ADMIN";
 
   return (
     <div className="flex min-h-screen">
@@ -22,6 +23,9 @@ export default async function StudioLayout({ children }: LayoutProps<"/studio">)
               <Link href="/studio/comments" className="rounded-md px-3 py-2 hover:bg-bg">Comments</Link>
               <Link href="/studio/analytics" className="rounded-md px-3 py-2 hover:bg-bg">Analytics</Link>
             </>
+          )}
+          {isAdmin && (
+            <Link href="/studio/users" className="rounded-md px-3 py-2 hover:bg-bg">People</Link>
           )}
         </nav>
 

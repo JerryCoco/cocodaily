@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { PasswordField } from "@/components/password-field";
 import { registerReader } from "./actions";
 
 export default function RegisterPage() {
@@ -27,10 +28,7 @@ export default function RegisterPage() {
           <span className="text-muted">Email</span>
           <input name="email" type="email" required className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-accent" />
         </label>
-        <label className="text-sm">
-          <span className="text-muted">Password</span>
-          <input name="password" type="password" required minLength={8} className="mt-1 w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-accent" />
-        </label>
+        <PasswordField name="password" label="Password" required minLength={8} autoComplete="new-password" />
         <label className="flex items-start gap-2.5 rounded-md border border-line px-3 py-2.5 text-sm">
           <input name="contributor" type="checkbox" className="mt-0.5 accent-accent" />
           <span>
