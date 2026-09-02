@@ -1,10 +1,10 @@
-# Coco News
+# Coco Daily
 
 A full-stack news platform: a fast, SEO-strong public site with an editorial CMS
 behind it. Staff draft, review, schedule and publish stories; readers browse by
 section, search, comment, save articles and subscribe to a briefing.
 
-**Live:** https://coco-news.vercel.app &nbsp;·&nbsp; **Newsroom:** `/studio`
+**Live:** https://cocodaily.vercel.app &nbsp;·&nbsp; **Newsroom:** `/studio`
 
 > Portfolio project. Demo content is pulled from The Guardian's Open Platform and
 > Ghanaian newsroom RSS feeds, shown as attributed excerpts that link back to the
