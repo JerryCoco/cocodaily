@@ -15,7 +15,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
               News from Ghana and around the world.
             </p>
             <p className="mt-3 text-sm">
-              <Link href="/feed.xml" className="text-muted hover:text-ink">RSS</Link>
+              <Link href="/contribute" className="text-muted hover:text-ink">Write for Coco</Link>
             </p>
           </div>
           <NewsletterSignup />

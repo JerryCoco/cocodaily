@@ -46,8 +46,13 @@ export function HeaderAccount() {
           <Link href="/account/saved" className="block px-3 py-2 hover:bg-bg">
             Saved articles
           </Link>
-          {user.role && user.role !== "READER" && (
+          <Link href="/account/password" className="block px-3 py-2 hover:bg-bg">
+            Password
+          </Link>
+          {user.role && user.role !== "READER" ? (
             <Link href="/studio" className="block px-3 py-2 hover:bg-bg">Newsroom</Link>
+          ) : (
+            <Link href="/contribute" className="block px-3 py-2 hover:bg-bg">Write for Coco</Link>
           )}
           <form action={signOutAction}>
             <button className="block w-full px-3 py-2 text-left text-muted hover:bg-bg hover:text-accent">
