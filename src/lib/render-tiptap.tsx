@@ -88,7 +88,9 @@ function renderNode(node: Node, key: number): ReactNode {
       );
     }
     case "text":
-      return applyMarks(node.text ?? "", node.marks, key);
+      // Wrap in a keyed Fragment: applyMarks may return a mark element
+      // (<a>, <strong>, …) with no key, which warns when it's a mapped child.
+      return <Fragment key={key}>{applyMarks(node.text ?? "", node.marks, key)}</Fragment>;
     default:
       return null; // unknown node — dropped
   }

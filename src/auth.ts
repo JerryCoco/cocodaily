@@ -36,11 +36,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       // Throttled last-seen bump — powers /studio/users. Fire-and-forget.
+      // updateMany so a deleted/stale account is a no-op, not a thrown P2025.
       const now = Date.now();
       if (token.uid && now - ((token.seenAt as number | undefined) ?? 0) > SEEN_THROTTLE_MS) {
         token.seenAt = now;
         void prisma.user
-          .update({ where: { id: token.uid as string }, data: { lastSeenAt: new Date() } })
+          .updateMany({ where: { id: token.uid as string }, data: { lastSeenAt: new Date() } })
           .catch(() => {});
       }
       return token;
