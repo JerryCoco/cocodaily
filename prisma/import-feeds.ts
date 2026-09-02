@@ -31,19 +31,45 @@ const SECTIONS = [
 ];
 
 const GUARDIAN: { params: string; section: string; take: number }[] = [
-  { params: "section=world", section: "world", take: 10 },
-  { params: "tag=world/africa", section: "africa", take: 9 },
-  { params: "section=business", section: "business", take: 9 },
-  { params: "section=technology", section: "tech", take: 9 },
-  { params: "section=sport", section: "sport", take: 9 },
-  { params: "section=culture", section: "culture", take: 9 },
+  // world
+  { params: "section=world", section: "world", take: 40 },
+  { params: "section=us-news", section: "world", take: 10 },
+  { params: "section=environment", section: "world", take: 10 },
+  // africa  (+ Guardian's own Ghana coverage feeds the Ghana section)
+  { params: "tag=world/africa", section: "africa", take: 40 },
+  { params: "tag=world/nigeria", section: "africa", take: 10 },
+  { params: "tag=world/kenya", section: "africa", take: 8 },
+  { params: "tag=world/ghana", section: "ghana", take: 20 },
+  // business
+  { params: "section=business", section: "business", take: 35 },
+  { params: "section=money", section: "business", take: 10 },
+  // tech
+  { params: "section=technology", section: "tech", take: 35 },
+  { params: "section=games", section: "tech", take: 8 },
+  // sport
+  { params: "section=sport", section: "sport", take: 30 },
+  { params: "section=football", section: "sport", take: 15 },
+  // culture
+  { params: "section=culture", section: "culture", take: 20 },
+  { params: "section=film", section: "culture", take: 12 },
+  { params: "section=music", section: "culture", take: 10 },
+  { params: "section=books", section: "culture", take: 8 },
+  { params: "section=tv-and-radio", section: "culture", take: 8 },
 ];
 
+// Ghanaian newsrooms with a working RSS feed (verified 2026-09). rss-parser
+// follows the http->https redirects some of these use.
 const GHANA_FEEDS = [
   "https://www.myjoyonline.com/feed/",
-  "https://citinewsroom.com/feed/",
+  "https://www.myjoyonline.com/business/feed/",
+  "https://www.myjoyonline.com/sports/feed/",
   "https://3news.com/feed/",
-  "https://www.graphic.com.gh/?format=feed&type=rss",
+  "https://www.adomonline.com/feed/",
+  "https://www.graphic.com.gh/news?format=feed&type=rss",
+  "https://gbcghanaonline.com/feed/",
+  "https://starrfm.com.gh/feed/",
+  "https://www.ghanabusinessnews.com/feed/",
+  "https://norvanreports.com/feed/",
 ];
 
 // ---- helpers ----------------------------------------------------------------
@@ -89,7 +115,7 @@ type GResult = {
 
 async function guardian(params: string, section: string, take: number): Promise<Draft[]> {
   const url =
-    `https://content.guardianapis.com/search?${params}&order-by=newest&page-size=${take + 5}` +
+    `https://content.guardianapis.com/search?${params}&order-by=newest&page-size=${Math.min(take + 5, 50)}` +
     `&show-fields=headline,trailText,bodyText,thumbnail,byline&api-key=${KEY}`;
   for (let attempt = 1; attempt <= 4; attempt++) {
     const res = await fetch(url);
@@ -133,7 +159,7 @@ const rss = new Parser({
   customFields: { item: [["content:encoded", "contentEncoded"], ["media:content", "mediaContent", { keepArray: true }]] },
 });
 
-async function ghanaFeeds(perFeed = 6): Promise<Draft[]> {
+async function ghanaFeeds(perFeed = 14): Promise<Draft[]> {
   const out: Draft[] = [];
   for (const feedUrl of GHANA_FEEDS) {
     try {
@@ -172,15 +198,19 @@ async function ghanaFeeds(perFeed = 6): Promise<Draft[]> {
 }
 
 // ---- authors ------------------------------------------------------------
+const authorCache = new Map<string, string>();
 async function authorId(name: string) {
   const clean = (name || "Coco Wire").slice(0, 80);
   const email = `${slugify(clean) || "wire"}@coco.contrib`;
+  const hit = authorCache.get(email);
+  if (hit) return hit;
   const u = await prisma.user.upsert({
     where: { email },
     update: {},
     create: { name: clean, email, role: "WRITER", bio: "Contributor." },
     select: { id: true },
   });
+  authorCache.set(email, u.id);
   return u.id;
 }
 
@@ -203,11 +233,19 @@ async function main() {
   }
   drafts.push(...(await ghanaFeeds()));
 
-  if (drafts.length < 15) {
-    console.error(`Only ${drafts.length} articles fetched (need >=15) — aborting, database untouched.`);
+  // de-dupe: feeds overlap (e.g. a MyJoy story in both the main and sports feed)
+  const byUrl = new Map<string, Draft>();
+  for (const d of drafts) {
+    const key = d.sourceUrl || `${d.section}:${d.title}`;
+    if (!byUrl.has(key)) byUrl.set(key, d);
+  }
+  const unique = [...byUrl.values()];
+
+  if (unique.length < 15) {
+    console.error(`Only ${unique.length} articles fetched (need >=15) — aborting, database untouched.`);
     return;
   }
-  console.log(`fetched ${drafts.length} articles — rebuilding…`);
+  console.log(`fetched ${drafts.length} (${unique.length} unique) — rebuilding…`);
 
   // sections
   for (const s of SECTIONS) {
@@ -232,7 +270,7 @@ async function main() {
   const seen = new Set<string>();
   let made = 0;
 
-  for (const d of drafts) {
+  for (const d of unique) {
     const sectionId = sec.get(d.section);
     if (!sectionId || d.paras.length === 0) continue;
     let slug = slugify(d.title).slice(0, 72);

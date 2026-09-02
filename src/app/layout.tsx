@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   },
   description:
     "News from Ghana and around the world: politics, business, tech, sport and culture.",
+  alternates: {
+    types: { "application/rss+xml": "/feed.xml" },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
