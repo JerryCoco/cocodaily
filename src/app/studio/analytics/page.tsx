@@ -15,9 +15,9 @@ export const metadata = { title: "Analytics" };
 
 function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="rounded-lg border border-line bg-surface p-4">
-      <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
-      <div className="mt-1 text-2xl font-bold tabular-nums">{value}</div>
+    <div className="rounded-2xl border border-line bg-surface p-4">
+      <div className="kicker text-muted">{label}</div>
+      <div className="font-display mt-1.5 text-3xl font-extrabold tabular-nums">{value}</div>
       {hint && <div className="mt-0.5 text-xs text-muted">{hint}</div>}
     </div>
   );
@@ -25,8 +25,8 @@ function Stat({ label, value, hint }: { label: string; value: string | number; h
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-line bg-surface p-4">
-      <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-muted">{title}</h2>
+    <section className="rounded-2xl border border-line bg-surface p-4 md:p-5">
+      <h2 className="kicker mb-3 text-muted">{title}</h2>
       {children}
     </section>
   );
@@ -52,9 +52,9 @@ export default async function AnalyticsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-extrabold">Analytics</h1>
+      <h1 className="font-display text-2xl font-extrabold md:text-3xl">Analytics</h1>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Total views" value={ov.totalViews.toLocaleString()} />
         <Stat label="Views (30d)" value={views30.toLocaleString()} />
         <Stat label="Published" value={ov.published} />
@@ -68,10 +68,10 @@ export default async function AnalyticsPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <Card title="Views — last 30 days">
+        <Card title="Views · last 30 days">
           <AreaChart data={views} label="Article views per day, last 30 days" />
         </Card>
-        <Card title="New subscribers — last 30 days">
+        <Card title="New subscribers · 30 days">
           <AreaChart data={subs} label="New newsletter subscribers per day" />
         </Card>
 
@@ -96,7 +96,7 @@ export default async function AnalyticsPage() {
             {ov.pendingComments > 0 && (
               <p className="mt-3 text-sm">
                 <Link href="/studio/comments?status=PENDING" className="text-accent hover:underline">
-                  {ov.pendingComments} pending — review →
+                  {ov.pendingComments} pending · review →
                 </Link>
               </p>
             )}

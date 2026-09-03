@@ -1,49 +1,73 @@
 import Link from "next/link";
 import { requireStaff, canPublish } from "@/lib/auth-helpers";
 import { signOut } from "@/auth";
+import { StudioNav } from "@/components/studio/studio-nav";
 
 export default async function StudioLayout({ children }: LayoutProps<"/studio">) {
   const user = await requireStaff();
   const isEditor = canPublish(user.role);
   const isAdmin = user.role === "ADMIN";
 
+  const items = [
+    { href: "/studio", label: "Articles" },
+    { href: "/studio/articles/new", label: "New article" },
+    ...(isEditor
+      ? [
+          { href: "/studio/comments", label: "Comments" },
+          { href: "/studio/analytics", label: "Analytics" },
+        ]
+      : []),
+    ...(isAdmin ? [{ href: "/studio/users", label: "People" }] : []),
+  ];
+
+  const signOutForm = (
+    <form
+      action={async () => {
+        "use server";
+        await signOut({ redirectTo: "/" });
+      }}
+    >
+      <button className="text-xs font-medium text-muted hover:text-accent">Sign out</button>
+    </form>
+  );
+
   return (
-    <div className="flex min-h-screen">
-      <aside className="flex w-56 flex-col border-r border-line bg-surface px-4 py-6">
+    <div className="flex min-h-screen flex-col md:flex-row">
+      {/* Sidebar (desktop) */}
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface px-4 py-6 md:flex">
         <Link href="/" className="font-display text-xl font-extrabold">
           Coco
         </Link>
-        <p className="mt-1 text-xs text-muted">Newsroom</p>
+        <p className="mt-0.5 text-xs text-muted">Newsroom</p>
 
-        <nav className="mt-6 flex flex-col gap-1 text-sm">
-          <Link href="/studio" className="rounded-md px-3 py-2 hover:bg-bg">Articles</Link>
-          <Link href="/studio/articles/new" className="rounded-md px-3 py-2 hover:bg-bg">New article</Link>
-          {isEditor && (
-            <>
-              <Link href="/studio/comments" className="rounded-md px-3 py-2 hover:bg-bg">Comments</Link>
-              <Link href="/studio/analytics" className="rounded-md px-3 py-2 hover:bg-bg">Analytics</Link>
-            </>
-          )}
-          {isAdmin && (
-            <Link href="/studio/users" className="rounded-md px-3 py-2 hover:bg-bg">People</Link>
-          )}
-        </nav>
+        <StudioNav items={items} orientation="side" />
 
-        <div className="mt-auto border-t border-line pt-4 text-sm">
-          <p className="font-medium">{user.name}</p>
-          <p className="text-xs text-muted">{user.role.toLowerCase()}</p>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
-            <button className="mt-2 text-xs text-muted hover:text-accent">Sign out</button>
-          </form>
+        <div className="mt-auto border-t border-line pt-4">
+          <p className="text-sm font-semibold">{user.name}</p>
+          <span className="mt-1 inline-block rounded-full bg-bg px-2 py-0.5 text-[11px] font-medium capitalize text-muted">
+            {user.role.toLowerCase()}
+          </span>
+          <div className="mt-2">{signOutForm}</div>
         </div>
       </aside>
 
-      <main id="main" className="flex-1 px-8 py-8">{children}</main>
+      {/* Top bar (mobile) */}
+      <div className="sticky top-0 z-40 border-b border-line bg-surface/90 px-4 py-3 backdrop-blur-md md:hidden">
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline gap-2">
+            <Link href="/" className="font-display text-lg font-extrabold">
+              Coco
+            </Link>
+            <span className="text-xs text-muted">Newsroom</span>
+          </div>
+          {signOutForm}
+        </div>
+        <StudioNav items={items} orientation="top" />
+      </div>
+
+      <main id="main" className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8">
+        {children}
+      </main>
     </div>
   );
 }

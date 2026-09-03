@@ -44,19 +44,22 @@ export default async function StudioHome({ searchParams }: PageProps<"/studio">)
     take: 100,
   });
 
+  const fmtDay = (d: Date) =>
+    new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold">Articles</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-display text-2xl font-extrabold md:text-3xl">Articles</h1>
         <Link
           href="/studio/articles/new"
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover"
+          className="press shrink-0 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover"
         >
           New article
         </Link>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2 text-sm">
+      <div className="mt-5 -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 text-sm md:mx-0 md:flex-wrap md:px-0">
         <FilterLink label="All" active={!statusFilter} href="/studio" />
         {STATUS_ORDER.map((s) => (
           <FilterLink
@@ -68,46 +71,68 @@ export default async function StudioHome({ searchParams }: PageProps<"/studio">)
         ))}
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-lg border border-line bg-surface">
-        <table className="w-full text-sm">
-          <thead className="border-b border-line text-left text-muted">
-            <tr>
-              <th className="px-4 py-2 font-medium">Title</th>
-              <th className="px-4 py-2 font-medium">Section</th>
-              <th className="px-4 py-2 font-medium">Author</th>
-              <th className="px-4 py-2 font-medium">Status</th>
-              <th className="px-4 py-2 font-medium">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
+      {articles.length === 0 ? (
+        <p className="mt-8 rounded-2xl border border-dashed border-line bg-surface px-4 py-12 text-center text-sm text-muted">
+          Nothing here yet.
+        </p>
+      ) : (
+        <>
+          {/* Cards (mobile) */}
+          <ul className="mt-4 flex flex-col gap-2 md:hidden">
             {articles.map((a) => (
-              <tr key={a.id} className="border-b border-line last:border-0 hover:bg-bg">
-                <td className="px-4 py-2">
-                  <Link href={`/studio/articles/${a.id}/edit`} className="font-medium text-accent">
-                    {a.title}
-                  </Link>
-                </td>
-                <td className="px-4 py-2 text-muted">{a.section.name}</td>
-                <td className="px-4 py-2 text-muted">{a.author.name}</td>
-                <td className="px-4 py-2"><StatusBadge status={a.status} /></td>
-                <td className="px-4 py-2 text-muted">
-                  {new Date(a.updatedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </td>
-              </tr>
+              <li key={a.id}>
+                <Link
+                  href={`/studio/articles/${a.id}/edit`}
+                  className="press block rounded-2xl border border-line bg-surface p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-semibold leading-snug">{a.title}</p>
+                    <StatusBadge status={a.status} />
+                  </div>
+                  <p className="mt-2 text-xs text-muted">
+                    {a.section.name} · {a.author.name} · {fmtDay(a.updatedAt)}
+                  </p>
+                </Link>
+              </li>
             ))}
-            {articles.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-muted">
-                  Nothing here yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          </ul>
+
+          {/* Table (desktop) */}
+          <div className="mt-4 hidden overflow-hidden rounded-2xl border border-line bg-surface md:block">
+            <table className="w-full text-sm">
+              <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Title</th>
+                  <th className="px-4 py-3 font-semibold">Section</th>
+                  <th className="px-4 py-3 font-semibold">Author</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {articles.map((a) => (
+                  <tr key={a.id} className="border-b border-line last:border-0 hover:bg-bg">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/studio/articles/${a.id}/edit`}
+                        className="font-semibold hover:text-accent"
+                      >
+                        {a.title}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-muted">{a.section.name}</td>
+                    <td className="px-4 py-3 text-muted">{a.author.name}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={a.status} />
+                    </td>
+                    <td className="px-4 py-3 text-muted">{fmtDay(a.updatedAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -116,8 +141,10 @@ function FilterLink({ label, active, href }: { label: string; active: boolean; h
   return (
     <Link
       href={href}
-      className={`rounded-full border px-3 py-1 capitalize ${
-        active ? "border-ink bg-ink text-white" : "border-line text-muted hover:bg-bg"
+      className={`press shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 capitalize ${
+        active
+          ? "border-accent bg-accent text-white"
+          : "border-line text-muted hover:bg-bg hover:text-ink"
       }`}
     >
       {label}

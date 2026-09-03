@@ -5,7 +5,7 @@ import { useEffect } from "react";
 /** Records one view per browser session per article (dedupe via sessionStorage). */
 export function ViewPing({ articleId }: { articleId: string }) {
   useEffect(() => {
-    const key = `viewed:${articleId}`;
+    const key = `cocodaily:viewed:${articleId}`;
     try {
       if (sessionStorage.getItem(key)) return;
       sessionStorage.setItem(key, "1");
